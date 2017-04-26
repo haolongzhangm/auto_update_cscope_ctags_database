@@ -1,4 +1,4 @@
-==================================================================================================
+===========================================================================================
 Ｂrief introduction
 vim srcipt for auto update cscope and ctags databse
 
@@ -12,7 +12,7 @@ Install:
                      then run :
                         :PluginInstall
                         
- ==================================================================================================  
+ ==========================================================================================
  Env check: must install  cscope  ctags  sed  python  gnome-osd-client(not must, if install it , will GUI show
  after update finish)
  
@@ -20,10 +20,8 @@ Install:
  Config youself needed in ~.vimrc if needed (I think no need customization if really needed):
  
  "For debug print"
+ "g:Auto_update_cscope_ctags_debug_log
 "default value 0"
-if !exists('g:Auto_update_cscope_ctags_debug_log')
-        let g:Auto_update_cscope_ctags_debug_log = 0
-endif
 
 "For lock reflash Time:"
 "default value 60"
@@ -33,9 +31,7 @@ endif
 "                   you can modify to 10s or 1s, which I do not suggest"
 "                   ,caused by csocpe or ctags gen database may take a"
 "                   big occupy on disk,you can override at .vimrc"
-if !exists('g:Auto_update_cscope_ctags_lock_floor_min')
-        let g:Auto_update_cscope_ctags_lock_floor_min = 60
-endif
+
 
 "g:Auto_update_cscope_ctags_lock_floor_max"
 "default value 1800"
@@ -46,19 +42,16 @@ endif
 "                   so, I suggest keep, this vale to 1800(30min), if you PC"
 "                   I/O is so slow more than 30min, you may chang this value"
 "                   you can override at .vimrc"
-if !exists('g:Auto_update_cscope_ctags_lock_floor_max')
-        let g:Auto_update_cscope_ctags_lock_floor_max = 1800
-endif
+
 
 "g:auto_update_cscope_ctags_backup_run_py_dir_cache"
 "default ~/.vim/plugin/"
 "                   you may set this in you .vimrc"
 "                   for plugn run quickly, but even"
 "                   you config err, we can also find it"
-if !exists('g:auto_update_cscope_ctags_backup_run_py_name_cache')
-        let g:auto_update_cscope_ctags_backup_run_py_name_cache = '~/.vim/plugin/auto_update_cscope_ctags_backup_run.py'
-endif
-==================================================================================================
+
+
+=======================================================================================
  
         
         
