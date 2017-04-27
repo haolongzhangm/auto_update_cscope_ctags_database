@@ -169,7 +169,7 @@ function s:Cycle_csdb()
 	"so try to update ctags file when proj chang from A to B
 	if filereadable(newcsdbpath . "/tags")
 		"echo "Found tags at: " . newcsdbpath
-		execute 'set tags ='. newcsdbpath . '/tags;'
+		execute 'set tags ='. newcsdbpath . '/tags'
 	else
 		"echo "No tags"
 		execute 'set tags ='
