@@ -116,7 +116,7 @@ def gen_cscope_and_ctag_file():
             debug_backrun_python_print("Called from vim")
             ctags_cmd = "ctags -R --fields=+lS -L tags.files -f .auto_cscope_ctags/tags; rm tags.files"
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
-            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ../"
+            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
         else:
             ctags_cmd = "ctags -R --fields=+lS -L tags.files -f tags; rm tags.files"
             print(ctags_cmd)
