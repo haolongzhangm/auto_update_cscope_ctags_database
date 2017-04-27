@@ -6,7 +6,7 @@ import sys
 import time
 import getpass
 
-arch_parameter_list = ['normal', 'alpha', 'arm', 'arm64', 'avr32', \
+arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
         'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
         'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
         'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
@@ -22,7 +22,6 @@ global_back_run_log_file = '/tmp/.Auto_update_cscope_ctags_debug_back_run.log'
 second_parameter_list = ['cscope_only', 'cscope_and_ctags']
 def Usage():
     print('v1.0')
-    print('withqcn')
     print('python auto_update_cscope_ctags_backup_run.py [ARCH] [tags_type] [pwd/default .]')
     exit()
 

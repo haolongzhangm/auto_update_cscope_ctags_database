@@ -53,27 +53,77 @@ if !exists('g:auto_run_function_when_cscope_connect')
         let g:auto_run_function_when_cscope_connect = 1
 endif
 
-command! -nargs=0 -bar Manualstartstopautoupdatedatabase
-    \  call <SID>Manual_start_stop_auto_update_database()
+command! -nargs=0 -bar Manualstartstopautoupdatedatabas
+    \  call <SID>Manual_start_stop_auto_update_database(0)
+
+command! -nargs=0 -bar Createtag
+    \  call <SID>Manual_start_stop_auto_update_database(1)
 
 if g:auto_run_function_when_cscope_connect == 1
 	if g:Auto_update_cscope_ctags_running_status == 0
 		"echo "auto enable tags upload""
 		if g:autocommands_loaded == 0
 		  let g:autocommands_loaded = 1
-		  autocmd BufWritePost * call <SID>Auto_update_cscope_ctags()
+		  autocmd BufWritePost * call <SID>Auto_update_cscope_ctags(0)
 		endif
 		let g:Auto_update_cscope_ctags_running_status = 1
 	endif
 endif
 
 
-function! <SID>Manual_start_stop_auto_update_database()
+function! <SID>Manual_start_stop_auto_update_database(mode)
+if 1 == a:mode
+let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
+        \ 'c6x':'1', 'frv':'1', 'hexagon':'1', 'm68k':'1', 'microblaze':'1', 'mn10300':'1',
+        \ 'parisc':'1', 's390':'1', 'sh':'1', 'tile':'1', 'unicore32':'1', 'xtensa':'1',
+        \ 'arc':'1', 'arm64':'1', 'blackfin':'1', 'cris':'1' ,'h8300':'1', 'ia64':'1',
+        \ 'm32r':'1', 'metag':'1', 'mips':'1', 'openrisc':'1', 'powerpc':'1', 'score':'1',
+        \ 'sparc':'1', 'um':'1', 'x86':'1'
+        \ }
+    call <SID>Auto_update_cscope_ctags(a:mode)
+    if '0' == g:create_tag_run_py_ret_vim
+        echo ' '
+        echo ' '
+        echo ' '
+        echo "ERR: Can not find auto_update_cscope_ctags_backup_run.py"
+        echo ' '
+        echo ' '
+        return 0
+    endif
+
+    if 1 == g:Createtag_need_input_arch
+        let g:arch_str = input("please input a ARCH: ")
+        while ! has_key(vim_arch_parameter_d, g:arch_str)
+            echo " "
+            echo " "
+            echo ">>>>>>>>Do not support " . g:arch_str . " ARCH"
+            echo " "
+            let g:arch_str = input("please input a ARCH: ")
+        endwhile
+    else
+        let g:arch_str = "normal"
+    endif
+
+    echo " "
+    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim
+    echo "Will run command:\n" . g:run_c
+    echo " "
+    echo " "
+    echo " "
+    echo " "
+    let g:tmps = input("Will take a about one minutes, please input space start")
+    exe '!' . g:run_c
+    execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
+    exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
+
+    return 0
+endif
+
 if g:Auto_update_cscope_ctags_running_status == 0
     echo "Manual start auto update tag database"
 	if g:autocommands_loaded == 0
 	  let g:autocommands_loaded = 1
-	  autocmd BufWritePost * call <SID>Auto_update_cscope_ctags()
+	  autocmd BufWritePost * call <SID>Auto_update_cscope_ctags(0)
 	endif
     let g:Auto_update_cscope_ctags_running_status = 1
 else
@@ -84,14 +134,51 @@ endif
 
 endfunction
 
-function! <SID>Auto_update_cscope_ctags()
+function! <SID>FindBufferReallyPwd()
+	let l:Findcomand_args = './'
+	let l:Findcommand_args_buffer_name = bufname('%')
+	let l:Findcommand_args_pwd = getcwd()
+	if char2nr(l:Findcommand_args_buffer_name) == 47
+		"echo "Absolute path""
+		let l:Findcomand_args = l:Findcommand_args_buffer_name
+	elseif char2nr(l:Findcommand_args_buffer_name) == 0
+		echo "No buffers"
+		let l:Findcomand_args = l:Findcommand_args_pwd
+                let g:curbufferpwd = l:Findcomand_args
+                return 0
+	else
+		"echo "relative path""
+		let l:Findcomand_args = l:Findcommand_args_pwd . '/' . l:Findcommand_args_buffer_name
+	endif
+	echo 'BUF: ' . l:Findcomand_args
+	echo 'CUR: ' . l:Findcommand_args_pwd
+if has('python') || has('python3')
+python << EOF
+import vim
+find_tmp_str = vim.eval("l:Findcomand_args")
+find_command_str = "let g:curbufferpwd = '%s'" %  (find_tmp_str[:find_tmp_str.rindex("/")])
+vim.command(find_command_str)
+EOF
+else
+	echo 'Pls build vim with python'
+endif
+endfunction
 
-	if g:Auto_update_cscope_ctags_running_status == 0
+function! <SID>Auto_update_cscope_ctags(create_mode)
+
+        if 1 == a:create_mode
+            call <SID>FindBufferReallyPwd()
+            let g:Create_Mode = 1
+        else
+            let g:Create_Mode = 0
+        endif
+
+	if g:Auto_update_cscope_ctags_running_status == 0 && 0 == g:Create_Mode
 		"echo "Already stop, just return""
 		return 0
 	endif
 
-	if cscope_connection() <= 0
+	if cscope_connection() <= 0 && 0 == g:Create_Mode
 		"echo "Do not find tags, return""
 		return 0
 	endif
@@ -108,7 +195,7 @@ import time
 import getpass
 
 global_log_file = '/tmp/.Auto_update_cscope_ctags_debug_log.log'
-arch_parameter_list = ['normal', 'alpha', 'arm', 'arm64', 'avr32', \
+arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
         'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
         'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
         'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
@@ -267,9 +354,110 @@ def get_backup_run_py():
 
     return ret
 
+def check_kernel_code_characteristic(check_tree):
+
+    #list some dir of kernel code here
+    kernel_code_tree_characteristic_set = ['arch', 'block', 'Documentation', 'drivers', \
+            'firmware', 'fs', 'include', 'init', 'ipc', 'kernel', 'lib', 'mm', \
+            'net']
+    #if we check the code is kernel tree, we will use ./scripts/tags.sh to gen tag, so
+    #we need double check file exists(realize function : make cscope ARCH=[ARCH])
+    kernel_tree_force_check_file = '/scripts/tags.sh'
+    #to now, kernel code sub_dirs do not more then 12
+    check_dir_level = 12
+    i = 0
+    kernel_tree_or_not = 'false'
+    cache_dir = check_tree
+    old_dir = os.getcwd()
+    debug_python_print("old dir :%s" % old_dir)
+
+    while (i < check_dir_level):
+        i = i + 1
+        if not os.path.exists(cache_dir):
+            Err_print("Err happned when match kernel tree %s" % cache_dir)
+            os.chdir(old_dir)
+            return 0
+
+        os.chdir(cache_dir)
+        debug_python_print("check_kernel_code_characteristic i = %s" % i)
+        tmp_list_file = os.listdir(cache_dir)
+        if set(kernel_code_tree_characteristic_set).issubset(set(tmp_list_file)):
+            debug_python_print("check_kernel_code_characteristic: find kernel_tree %s" % cache_dir)
+            kernel_tree_or_not = 'true'
+            break
+        else:
+            cache_dir=cache_dir[:cache_dir.rindex("/")]
+            if cache_dir == '':
+                debug_python_print("already to home dir")
+                cache_dir = '/'
+                break
+            debug_python_print("now try dir %s" % cache_dir)
+
+    if 'true' == kernel_tree_or_not:
+        force_file = cache_dir + kernel_tree_force_check_file
+        if os.path.exists(force_file):
+            os.chdir(old_dir)
+            return (cache_dir, kernel_tree_or_not)
+        else:
+            kernel_tree_or_not = 'false'
+            debug_python_print("check force file check %s failed" % force_file)
+            os.chdir(old_dir)
+            return (check_tree, kernel_tree_or_not)
+    else:
+        os.chdir(old_dir)
+        return (check_tree, kernel_tree_or_not)
+
 def main_loop():
 
     may_tags_dir = vim.eval("g:for_auto_update_cscope_ctag")
+    Create_Mode_I = int(vim.eval("g:Create_Mode"))
+    #set a err status fisrtly
+    vim.command("let g:create_tag_run_py_ret_vim = '0'")
+    if 1 == Create_Mode_I:
+        default_tag_dir = vim.eval("g:curbufferpwd")
+        ret_check_lock_status_and_time = check_lock_status_and_time(default_tag_dir + "/.auto_cscope_ctags/lock")
+        if 1 == ret_check_lock_status_and_time or 2 == ret_check_lock_status_and_time:
+            Err_print("anthor update proccess go..., pls wait a moment to try ")
+            return 0
+        print("Now try to Create cscope and ctags database")
+        if not os.path.exists(default_tag_dir):
+            Err_print("invaild default_tag_dir = %s" % default_tag_dir)
+            return 0
+
+        debug_python_print("creat tag: find default_tag_dir = %s" % default_tag_dir)
+        (to_user_suggest_tag_dir, kernel_tree) = check_kernel_code_characteristic(default_tag_dir)
+        if not os.path.exists(to_user_suggest_tag_dir):
+            Err_print("Err happned invaild dir = %s" % to_user_suggest_tag_dir)
+            return 0
+
+        if 'true' == kernel_tree:
+            print("we find kernel code tree at %s" % to_user_suggest_tag_dir)
+            print("Support ARCH:")
+            print(arch_parameter_list)
+            vim.command("let g:Createtag_need_input_arch = 1")
+        else:
+            print("A normal project will create")
+            vim.command("let g:Createtag_need_input_arch = 0")
+            #vim python do not support input, so we will retrun to vim env after print
+            #input_str = 'null'
+            #input_str = input("Please input cpu ARCH:")
+            #while input not in arch_parameter_list:
+            #    print("Support ARCH:")
+            #    print(arch_parameter_list)
+            #    input_str = raw_input("Please input a vaild cpu ARCH:")
+
+        #before return we need return back_run_python_dir and put to_user_suggest_tag_dir to vim
+        create_tag_run_py_ret = get_backup_run_py()
+        if 'null' != create_tag_run_py_ret and os.path.exists(create_tag_run_py_ret):
+            tmp_put_create_tag_run_py_ret_vim = "let g:create_tag_run_py_ret_vim = '%s'" % create_tag_run_py_ret
+            debug_python_print("ddfgfghgfdsa %s" % tmp_put_create_tag_run_py_ret_vim)
+            vim.command(tmp_put_create_tag_run_py_ret_vim)
+            to_user_suggest_tag_dir_str = "let g:to_user_suggest_tag_dir_str_vim = '%s'" % to_user_suggest_tag_dir
+            vim.command(to_user_suggest_tag_dir_str)
+
+        return 0
+
+    #####end create mode ####
 
     #for debug
     #debug_python_print("may_tags_dir = %s" % may_tags_dir)
