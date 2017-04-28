@@ -140,11 +140,11 @@ endfunc
 " Unload_csdb
 "  drop cscope connections.
 function s:Unload_csdb()
-  if exists("b:csdbpath")
-    if cscope_connection(3, "out", b:csdbpath)
+  if exists("g:csdbpath")
+    if cscope_connection(3, "out",g:csdbpath)
       let save_csvb = &csverb
       set nocsverb
-      exe "cs kill " . b:csdbpath
+      exe "cs kill " . g:csdbpath
       set csverb
       let &csverb = save_csvb
     endif
@@ -155,8 +155,8 @@ endfunc
 " Cycle_csdb
 "  cycle the loaded cscope db.
 function s:Cycle_csdb()
-    if exists("b:csdbpath")
-      if cscope_connection(3, "out", b:csdbpath)
+    if exists("g:csdbpath")
+      if cscope_connection(3, "out", g:csdbpath)
         return
         "it is already loaded. don't try to reload it.
       endif
@@ -175,11 +175,11 @@ function s:Cycle_csdb()
 		execute 'set tags ='
 	endif
     if newcsdbpath != "Nothing"
-      let b:csdbpath = newcsdbpath
-      if !cscope_connection(3, "out", b:csdbpath)
+      let g:csdbpath = newcsdbpath
+      if !cscope_connection(3, "out", g:csdbpath)
         let save_csvb = &csverb
         set nocsverb
-        exe "cs add " . b:csdbpath . "/cscope.out " . b:csdbpath
+        exe "cs add " . g:csdbpath . "/cscope.out " .g:csdbpath
         set csverb
         let &csverb = save_csvb
       endif

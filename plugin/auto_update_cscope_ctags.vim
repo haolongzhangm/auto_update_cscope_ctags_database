@@ -85,7 +85,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
         echo ' '
         echo ' '
         echo ' '
-        echo "ERR: Can not find auto_update_cscope_ctags_backup_run.py"
+        echo "Will do not gen tags: More detail check output log"
         echo ' '
         echo ' '
         return 0
@@ -111,10 +111,21 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     echo " "
     echo " "
     echo " "
-    let g:tmps = input("Will take a about one minutes, please input space start")
+    echo "Do not really want to  create tag at dir: [" . g:to_user_suggest_tag_dir_str_vim . "]?"
+    echo "Yes: please input yes start, will take about one minutes"
+    echo "NO : please input any other char to stop"
+    let b:tmps = input(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    echo " "
+    if "yes" == b:tmps || "YES" == b:tmps
+        echo b:tmps
+    else
+        echo "stop to create tags"
+        return 0
+    endif
     exe '!' . g:run_c
     execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
     exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
+    let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
 
     return 0
 endif
@@ -450,10 +461,12 @@ def main_loop():
         create_tag_run_py_ret = get_backup_run_py()
         if 'null' != create_tag_run_py_ret and os.path.exists(create_tag_run_py_ret):
             tmp_put_create_tag_run_py_ret_vim = "let g:create_tag_run_py_ret_vim = '%s'" % create_tag_run_py_ret
-            debug_python_print("ddfgfghgfdsa %s" % tmp_put_create_tag_run_py_ret_vim)
+            debug_python_print("create_tag_run_py_ret success %s" % tmp_put_create_tag_run_py_ret_vim)
             vim.command(tmp_put_create_tag_run_py_ret_vim)
             to_user_suggest_tag_dir_str = "let g:to_user_suggest_tag_dir_str_vim = '%s'" % to_user_suggest_tag_dir
             vim.command(to_user_suggest_tag_dir_str)
+        else:
+            Err_print("create_tag_run_py_ret err: get_backup_run_py = %s" % create_tag_run_py_ret)
 
         return 0
 
