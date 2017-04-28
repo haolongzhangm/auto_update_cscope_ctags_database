@@ -45,15 +45,30 @@ def check_args():
             Warnin_print(fifth_parameter_list)
             Usage()
 
+def check_os_cmd_exist(str):
+
+    ret = 0
+    popen_str = "which " + str + ' 2>&1'
+    debug_backrun_python_print("popen_str = %s" % popen_str)
+    if '' == os.popen(popen_str).read():
+        ret = 0
+    else:
+        ret = 1
+
+    return ret
 
 def gnome_osd_print(str):
-        cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
-                "auto_update_tags" + '\'' + " osd_fake_translucent_bg=" + \
-                '\'' + "on" + '\'' + " osd_vposition=" + '\'' + "center" + \
-                '\'' + " animations=" + '\'' + "off" + '\'' + " hide_timeout=" + \
-                '\'' + "2000" + '\'' + " osd_halignment=" + '\'' + "center" + '\'>' \
-                + str + "</message>" + '\"&'
-        os.system(cmd_str)
+    if 0 == check_os_cmd_exist("gnome-osd-client"):
+        Warnin_print("Do not find command: gnome-osd-client do not support GUI message")
+        return 0
+
+    cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
+            "auto_update_tags" + '\'' + " osd_fake_translucent_bg=" + \
+            '\'' + "on" + '\'' + " osd_vposition=" + '\'' + "bottom" + \
+            '\'' + " animations=" + '\'' + "off" + '\'' + " hide_timeout=" + \
+            '\'' + "4000" + '\'' + " osd_halignment=" + '\'' + "center" + '\'>' \
+            + str + "</message>" + '\"&'
+    os.system(cmd_str)
 
 def debug_backrun_python_print(str):
 
