@@ -13,14 +13,14 @@ endif
 
 "For lock reflash Time:"
 "default value 60"
-"g:Auto_update_cscope_ctags_lock_floor_min"
+"g:Auto_update_cscope_ctags_timer_filter"
 "                   this time for filter modify frequency"
 "                   if you want to see database update immediately"
 "                   you can modify to 10s or 1s, which I do not suggest"
 "                   ,caused by csocpe or ctags gen database may take a"
 "                   big occupy on disk,you can override at .vimrc"
-if !exists('g:Auto_update_cscope_ctags_lock_floor_min')
-        let g:Auto_update_cscope_ctags_lock_floor_min = 60
+if !exists('g:Auto_update_cscope_ctags_timer_filter')
+        let g:Auto_update_cscope_ctags_timer_filter = 60
 endif
 
 "g:Auto_update_cscope_ctags_lock_floor_max"
@@ -127,6 +127,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     endif
     exe '!' . g:run_c
     execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
+    exe "cs kill -1"
     exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
     let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
@@ -277,26 +278,47 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
     return ret
 
 def check_lock_status_and_time(lock_str):
-    # ret 0: lock release , 1 lock do not release, 
-    #2, lock fresh, 3: lock too old, -1, config err
+    # ret :
+    #-1, config err
+    #0: lock release , 
+    #1: lock hold 
+    #2, lock create before systemup, may cause by system shotdown when gen tag
+    #3: lock too old, 
     ret = -1
     if os.path.exists(lock_str):
+        ret = 1
+        btime_l= ['0', '0']
+        if os.path.exists('/proc/stat'):
+            f = open('/proc/stat', 'r')
+            for line in f:
+                #debug_python_print("/proc/stat line: %s" % line)
+                if 0 <= line.find('btime'):
+                    btime_f = line.split()
+                    break
+
+
+        btime_l_int = int(btime_f[1])
+        debug_python_print("btime: %s" % btime_l_int)
         debug_python_print("Find lock %s" % lock_str)
         now_time = time.time()
         md_time = os.stat(lock_str).st_mtime
+        if md_time < btime_l_int:
+            debug_python_print("lock need remove caused by md_time < btime_l_int")
+            debug_python_print("md_time = %s" % md_time)
+            debug_python_print("btime = %s" % btime_l_int)
+            ret = 2
+            return ret
+
         md_time_pass = now_time - md_time
         debug_python_print("lock md time pass %s" % (md_time_pass))
-        lock_reflash_min = int(vim.eval("g:Auto_update_cscope_ctags_lock_floor_min"))
+        filter_time = int(vim.eval("g:Auto_update_cscope_ctags_timer_filter"))
         lock_reflash_max = int(vim.eval("g:Auto_update_cscope_ctags_lock_floor_max"))
-        if lock_reflash_min >= lock_reflash_max:
+        if filter_time >= lock_reflash_max:
             ret = -1
             Err_print("Err: config g:Auto_update_cscope_ctags_lock_floor_min g:Auto_update_cscope_ctags_lock_floor_max ERR")
             return ret
 
-        if md_time_pass <= lock_reflash_min:
-            ret = 2
-            debug_python_print("Reflash to quick, ingore this time")
-        elif md_time_pass >= lock_reflash_max:
+        if md_time_pass >= lock_reflash_max:
             debug_python_print("Lock to old, need remove it")
             ret = 3
         else:
@@ -426,6 +448,22 @@ def check_kernel_code_characteristic(check_tree):
         os.chdir(old_dir)
         return (check_tree, kernel_tree_or_not)
 
+def reflash_too_quick(directory):
+    ret = 1
+    check_file = directory + '/cscope.files'
+    if os.path.exists(check_file):
+        now_time = time.time()
+        md_time = os.stat(check_file).st_mtime
+        f_time = now_time - md_time
+        filter_time = int(vim.eval("g:Auto_update_cscope_ctags_timer_filter"))
+        if f_time < filter_time:
+            debug_python_print("reflash_too_quick only pass %s" % f_time)
+            ret = 1
+        else:
+            ret = 0
+
+    return ret
+
 def main_loop():
 
     may_tags_dir = vim.eval("g:for_auto_update_cscope_ctag")
@@ -435,9 +473,10 @@ def main_loop():
     if 1 == Create_Mode_I:
         default_tag_dir = vim.eval("g:curbufferpwd")
         ret_check_lock_status_and_time = check_lock_status_and_time(default_tag_dir + "/.auto_cscope_ctags/lock")
-        if 1 == ret_check_lock_status_and_time or 2 == ret_check_lock_status_and_time:
+        if 1 == ret_check_lock_status_and_time:
             Warn_print("anthor update proccess go..., pls wait a moment to try ")
             return 0
+
         print("Now try to Create cscope and ctags database")
         if not os.path.exists(default_tag_dir):
             Warn_print("invaild default_tag_dir = %s" % default_tag_dir)
@@ -489,10 +528,10 @@ def main_loop():
         return 0
 
     check_lock_status_and_time_ret = check_lock_status_and_time(may_tags_dir + "/.auto_cscope_ctags/lock")
-    if 1 == check_lock_status_and_time_ret or 2 == check_lock_status_and_time_ret:
+    if 1 == check_lock_status_and_time_ret or -1 == check_lock_status_and_time_ret:
         return 0
 
-    if 3 == check_lock_status_and_time_ret:
+    if 3 == check_lock_status_and_time_ret or 2 == check_lock_status_and_time_ret:
         #checn file exists again for use rm command is so danger
         lock_file = "%s/.auto_cscope_ctags/lock" % may_tags_dir
         if os.path.exists(lock_file):
@@ -500,7 +539,10 @@ def main_loop():
             debug_python_print("rm lock file %s" % lock_file)
             os.system(rm_lock_cmd)
 
-    if 0 == check_lock_status_and_time_ret or 3 == check_lock_status_and_time_ret:
+    if 0 == check_lock_status_and_time_ret or 2 == check_lock_status_and_time_ret or 3 == check_lock_status_and_time_ret:
+        if 1 == reflash_too_quick(may_tags_dir):
+            return 0
+
         file_result = scan_f_new(may_tags_dir)
         if file_result > 0:
             handle_arch = check_cscope_files_type(may_tags_dir)
@@ -519,7 +561,7 @@ def main_loop():
         elif file_result == 0:
             debug_python_print("no need update")
         else:
-            debug_python_print("can not find tags, for later function")
+            debug_python_print("can not find cscope.flies, for later function")
             return 0
 
 main_loop()
