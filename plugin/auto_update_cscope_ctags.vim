@@ -42,7 +42,7 @@ endif
 "                   for plugn run quickly, but even"
 "                   you config err, we can also find it"
 if !exists('g:auto_update_cscope_ctags_backup_run_py_name_cache')
-        let g:auto_update_cscope_ctags_backup_run_py_name_cache = '~/.vim/plugin/auto_update_cscope_ctags_backup_run.py'
+        let g:auto_update_cscope_ctags_backup_run_py_name_cache = '~/.vim/bundle/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags_backup_run.py'
 endif
 
 "g:auto_run_function_when_cscope_connect"
@@ -105,7 +105,10 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     endif
 
     echo " "
-    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim
+    if cscope_connection() > 0
+        let g:to_user_suggest_tag_dir_str_vim = g:csdbpath
+    endif
+    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message"
     echo "Will run command:\n" . g:run_c
     echo " "
     echo " "
@@ -509,7 +512,7 @@ def main_loop():
             if 'null' != run_py_ret and os.path.exists(run_py_ret):
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err
-                back_run_cmd = "python %s %s %s %s &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                back_run_cmd = "python %s %s %s %s quiet &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
