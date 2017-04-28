@@ -74,6 +74,11 @@ def gen_cscope_and_ctag_file():
     debug_backrun_python_print(sys.argv[1])
     gnome_osd_print('%s project update tags start' % sys.argv[1])
     os.chdir(gen_tag_dir)
+    pre_create_lock_cmd = "mkdir .auto_cscope_ctags 1>/dev/null 2>&1; \
+            touch .auto_cscope_ctags/lock 1>/dev/null 2>&1"
+    debug_backrun_python_print("now create lock now")
+    os.system(pre_create_lock_cmd)
+    debug_backrun_python_print("end create lock now")
     if 'normal' == sys.argv[1]:
         normal_cmd = "find . -name '*.c' "
         for i_care_type in care_file_type:
@@ -125,8 +130,7 @@ def gen_cscope_and_ctag_file():
         debug_backrun_python_print("end for ctag")
 
     if len(sys.argv) == 4:
-        end_remove_lock_cmd = "cd %s; \
-                rm .auto_cscope_ctags/lock 1>/dev/null  2>&1" % gen_tag_dir
+        end_remove_lock_cmd = "rm .auto_cscope_ctags/lock 1>/dev/null  2>&1"
         debug_backrun_python_print("now for remove_lock_cmd")
         os.system(end_remove_lock_cmd)
         debug_backrun_python_print("end for remove_lock_cmd")

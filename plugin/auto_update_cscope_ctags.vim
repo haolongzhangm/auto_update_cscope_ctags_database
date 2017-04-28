@@ -126,6 +126,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
     exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
+    let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
 
     return 0
 endif
@@ -232,6 +233,10 @@ def Err_print(str_t):
     stop_run_cmd = "let g:Auto_update_cscope_ctags_running_status = 0"
     vim.command(stop_run_cmd)
 
+def Warn_print(str_t):
+    debug_python_print(str_t)
+    print(str_t)
+
 def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 '.java', '.sh', '.mk', '.prop', '.xml', 'Makefile', '.rc', 'platform', \
 'Drivers', '.scons', '.api', '.tla', '.smh', '.smi', '.smt', '.idl', '.te', \
@@ -311,7 +316,7 @@ def check_cscope_files_type(directory):
         #try to read fisrt three line from cscope.files
         f = open(check_file, 'r')
         if 0 == os.path.getsize(check_file):
-            Err_print("ERR: invaild file %s " % check_file)
+            Warn_print("ERR: invaild file %s " % check_file)
             return ret
 
         for line in f:
@@ -332,7 +337,7 @@ def check_cscope_files_type(directory):
             ret = 'normal'
 
     else:
-        Err_print("Err: can not find file %s" % check_file)
+        Warn_print("Err: can not find file %s" % check_file)
 
     return ret
 
@@ -385,9 +390,9 @@ def check_kernel_code_characteristic(check_tree):
     while (i < check_dir_level):
         i = i + 1
         if not os.path.exists(cache_dir):
-            Err_print("Err happned when match kernel tree %s" % cache_dir)
+            Warn_print("Err happned when match kernel tree %s" % cache_dir)
             os.chdir(old_dir)
-            return 0
+            return (check_tree, kernel_tree_or_not)
 
         os.chdir(cache_dir)
         debug_python_print("check_kernel_code_characteristic i = %s" % i)
@@ -428,26 +433,26 @@ def main_loop():
         default_tag_dir = vim.eval("g:curbufferpwd")
         ret_check_lock_status_and_time = check_lock_status_and_time(default_tag_dir + "/.auto_cscope_ctags/lock")
         if 1 == ret_check_lock_status_and_time or 2 == ret_check_lock_status_and_time:
-            Err_print("anthor update proccess go..., pls wait a moment to try ")
+            Warn_print("anthor update proccess go..., pls wait a moment to try ")
             return 0
         print("Now try to Create cscope and ctags database")
         if not os.path.exists(default_tag_dir):
-            Err_print("invaild default_tag_dir = %s" % default_tag_dir)
+            Warn_print("invaild default_tag_dir = %s" % default_tag_dir)
             return 0
 
         debug_python_print("creat tag: find default_tag_dir = %s" % default_tag_dir)
         (to_user_suggest_tag_dir, kernel_tree) = check_kernel_code_characteristic(default_tag_dir)
         if not os.path.exists(to_user_suggest_tag_dir):
-            Err_print("Err happned invaild dir = %s" % to_user_suggest_tag_dir)
+            Warn_print("Err happned invaild dir = %s" % to_user_suggest_tag_dir)
             return 0
 
         if 'true' == kernel_tree:
-            print("we find kernel code tree at %s" % to_user_suggest_tag_dir)
-            print("Support ARCH:")
-            print(arch_parameter_list)
+            Warn_print("we find kernel code tree at %s" % to_user_suggest_tag_dir)
+            Warn_print("Support ARCH:")
+            Warn_print(arch_parameter_list)
             vim.command("let g:Createtag_need_input_arch = 1")
         else:
-            print("A normal project will create")
+            Warn_print("A normal project will create")
             vim.command("let g:Createtag_need_input_arch = 0")
             #vim python do not support input, so we will retrun to vim env after print
             #input_str = 'null'
@@ -497,15 +502,13 @@ def main_loop():
         if file_result > 0:
             handle_arch = check_cscope_files_type(may_tags_dir)
             if handle_arch not in arch_parameter_list:
-                Err_print("Err: ARCH: %s do not support" % handle_arch)
+                Warn_print("Err: ARCH: %s do not support" % handle_arch)
                 return -1
 
             run_py_ret = get_backup_run_py()
             if 'null' != run_py_ret and os.path.exists(run_py_ret):
                 #vim script api do not support blocking time I/O, so we and '&' here
-                pre_create_lock_cmd = "cd %s 1>/dev/null 2>&1; mkdir .auto_cscope_ctags 1>/dev/null 2>&1; \
-                        touch .auto_cscope_ctags/lock 1>/dev/null 2>&1" % may_tags_dir
-                os.system(pre_create_lock_cmd)
+                #why do not use vim timer: long time I/O may cause vim exit err
                 back_run_cmd = "python %s %s %s %s &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
