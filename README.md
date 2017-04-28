@@ -11,15 +11,15 @@ brief
 can intelligent identificate kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
 we can intelligent find it is a kernel tree, then call make cscope [ARCH] for gen <br>
+kernel database<br>
 
-kernel database, suppor ARCH:<br>
+suppor ARCH:<br>
 alpha', 'arm', 'avr32', 'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', <br>
 parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', 'arc', 'arm64', 'blackfin', <br>
 cris', 'h8300', 'ia64', 'm32r', 'metag', 'mips', 'openrisc', 'powerpc', 'score', <br>
 sparc', 'um', 'x86<br>
-
-
-
+ 
+if we can not  match kernel tree we will use  find command to gen needed files  <br>
 
 Install
 ===
@@ -42,7 +42,7 @@ then run :<br>
 
 Env check
 ===
-need must install: cscope ctags sed python or vim_with_python( vim --version| grep python) <br>
+need must install: cscope ctags sed python and vim_with_python( vim --version| grep python) <br>
 
 if you os support command: gnome-osd-client , GUI will show mesage when collect　database <br>
 
