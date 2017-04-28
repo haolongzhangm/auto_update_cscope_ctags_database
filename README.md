@@ -1,6 +1,6 @@
 brief 
 ===
-#auto load cscope database and ctags databse, if diffrect project swicth(base third part)
+#auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----
 
 #auto update database if cscope connect
