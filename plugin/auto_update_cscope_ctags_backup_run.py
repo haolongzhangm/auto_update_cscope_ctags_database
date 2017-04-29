@@ -58,16 +58,22 @@ def check_os_cmd_exist(str):
     return ret
 
 def gnome_osd_print(str):
-    if 0 == check_os_cmd_exist("gnome-osd-client"):
-        debug_backrun_python_print("Do not find command: gnome-osd-client do not support GUI message")
-        return 0
-
-    cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
+    if 1 == check_os_cmd_exist("notify-send"):
+        debug_backrun_python_print("find command: notify-send")
+        cmd_str = "notify-send " + '\"' + str + '\"'+ " &"
+    elif 1 == check_os_cmd_exist("gnome-osd-client"):
+        debug_backrun_python_print("find command: gnome-osd-client")
+        cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
             "auto_update_tags" + '\'' + " osd_fake_translucent_bg=" + \
             '\'' + "on" + '\'' + " osd_vposition=" + '\'' + "bottom" + \
             '\'' + " animations=" + '\'' + "off" + '\'' + " hide_timeout=" + \
             '\'' + "4000" + '\'' + " osd_halignment=" + '\'' + "center" + '\'>' \
             + str + "</message>" + '\"&'
+    else :
+        debug_backrun_python_print("can not find gnome_osd_print and notify-send, do not show GUI message")
+        return 0
+
+    debug_backrun_python_print(cmd_str)
     os.system(cmd_str)
 
 def debug_backrun_python_print(str):
