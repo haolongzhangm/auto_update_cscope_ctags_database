@@ -59,7 +59,7 @@ def check_os_cmd_exist(str):
 
 def gnome_osd_print(str):
     if 0 == check_os_cmd_exist("gnome-osd-client"):
-        Warnin_print("Do not find command: gnome-osd-client do not support GUI message")
+        debug_backrun_python_print("Do not find command: gnome-osd-client do not support GUI message")
         return 0
 
     cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
