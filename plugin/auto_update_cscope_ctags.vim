@@ -53,6 +53,23 @@ if !exists('g:auto_run_function_when_cscope_connect')
         let g:auto_run_function_when_cscope_connect = 1
 endif
 
+"g:check_update_when_fisrt_load_vim"
+"default 1"
+"           when 1, we will try to check database need update or not"
+"           eg: you add some file in project or edit src by git pull or "
+"           other editer like gedit or notepad, we can detect the update"
+"           you can disable this Feature in .vimrc"
+if !exists('g:check_update_when_fisrt_load_vim')
+        let g:check_update_when_fisrt_load_vim = 1
+endif
+
+if !has('timers')
+    echo "Warning: you vim do not support timer"
+    echo "Feature ('auto reset cscope' and 'check_update_when_fisrt_load_vim') will disabled"
+    echo "just support base function update cscope and ctags"
+    echo "try to update you vim from github: https://github.com/vim/vim to remove this warning"
+endif
+
 command! -nargs=0 -bar Manualstartstopautoupdatedatabas
     \  call <SID>Manual_start_stop_auto_update_database(0)
 
@@ -114,7 +131,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     echo " "
     echo " "
     echo " "
-    echo "Do not really want to  create tag at dir: [" . g:to_user_suggest_tag_dir_str_vim . "]?"
+    echo "Do you really want to  create tag at dir: [" . g:to_user_suggest_tag_dir_str_vim . "]?"
     echo "Yes: please input yes start, will take about one minutes"
     echo "NO : please input any other char to stop"
     let b:tmps = input(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -571,3 +588,14 @@ else
 endif
 
 endfunction
+
+"why need timer: vim may Fistly load diff script, so we need"
+"add a timer later for 1.5s wait vim hava a chance to load cscope database"
+function! Fistly_check_needed_update_when_vim_load(Fistly_load_vim_timer)
+    "echo "Fistly check database update when load vim""
+    call <SID>Auto_update_cscope_ctags(0)
+endfunction
+
+if 1 == g:check_update_when_fisrt_load_vim && has('timers')
+    let Fistly_load_vim_timer = timer_start(1500, 'Fistly_check_needed_update_when_vim_load',{'repeat': 1})
+endif
