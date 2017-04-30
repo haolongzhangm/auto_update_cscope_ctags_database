@@ -109,12 +109,15 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     endif
 
     if 1 == g:Createtag_need_input_arch
+        echo "For example, if you just care ARM64 platform code, just need input arm64"
+        echo "if input 'normal', means: do not build a especially arch, but we do not suggest at a kernel tree"
         let g:arch_str = input("please input a ARCH: ")
         while ! has_key(vim_arch_parameter_d, g:arch_str)
             echo " "
             echo " "
-            echo ">>>>>>>>Do not support " . g:arch_str . " ARCH"
+            echo ">>>>>>>>Do not support " . "ARCH = ". g:arch_str
             echo " "
+            echo "For example, if you just care ARM64 platform code, just need input arm64"
             let g:arch_str = input("please input a ARCH: ")
         endwhile
     else
@@ -124,15 +127,32 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     echo " "
     if cscope_connection() > 0
         let g:to_user_suggest_tag_dir_str_vim = g:csdbpath
+    elseif "normal" == g:arch_str
+        let b:tmp_dir_i = 'null'
+        echo " "
+        echo "Customization for tag dir for 'normal' project"
+        echo "please input a dir you want ,suggest dir = " . g:to_user_suggest_tag_dir_str_vim
+        echo "Press 'Enter' to use suggest dir [" . g:to_user_suggest_tag_dir_str_vim . "]" 
+        \ . " or input dir which you tend to"
+        let b:tmp_dir_i = input("Press 'ENTER' or  input a dir string: ")
+        if "" == b:tmp_dir_i
+            echo " "
+            echo "use suggest dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]" 
+        else
+            echo " "
+            echo "use Customization dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]"
+            let g:to_user_suggest_tag_dir_str_vim = b:tmp_dir_i
+        endif
     endif
-    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message"
+
+    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . 
+    \ g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message"
+    echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
     echo " "
-    echo " "
-    echo " "
     echo "Do you really want to  create tag at dir: [" . g:to_user_suggest_tag_dir_str_vim . "]?"
-    echo "Yes: please input yes start, will take about one minutes"
+    echo "Yes: please input yes start, will take about one minutes(depend on code size and I/O performance)"
     echo "NO : please input any other char to stop"
     let b:tmps = input(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     echo " "
@@ -508,7 +528,9 @@ def main_loop():
         if 'true' == kernel_tree:
             Warn_print("we find kernel code tree at %s" % to_user_suggest_tag_dir)
             Warn_print("Support ARCH:")
+            Warn_print(" ")
             Warn_print(arch_parameter_list)
+            Warn_print(" ")
             vim.command("let g:Createtag_need_input_arch = 1")
         else:
             Warn_print("A normal project will create")
