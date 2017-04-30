@@ -16,6 +16,8 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
         'Drivers', '*.scons', '*.api', '*.tla', '*.smh', '*.smi', 
         '*.smt', '*.idl', '*.te', '*.py', '*.S']
 
+needed_env_list = ['python', 'cscope', 'sed', 'ctags']
+
 global_back_run_log_file = '/tmp/.Auto_update_cscope_ctags_debug_back_run.log'
 
 second_parameter_list = ['cscope_only', 'cscope_and_ctags']
@@ -101,6 +103,16 @@ def gen_cscope_and_ctag_file():
     gen_tag_dir = './'
     if len(sys.argv) == 4 or len(sys.argv) == 5:
         gen_tag_dir = sys.argv[3]
+
+    if not os.path.exists(gen_tag_dir):
+        Warnin_print("Err :invalid gen_tag_dir : %s" % gen_tag_dir)
+        return 0
+
+    #check needed env
+    for env_i in needed_env_list:
+        if 0 == check_os_cmd_exist(env_i):
+            Warnin_print("ERR: can not find %s pls install it fistly" % env_i)
+            return 0
 
     debug_backrun_python_print(sys.argv[1])
     gnome_osd_print('%s project update tags start' % sys.argv[1])
