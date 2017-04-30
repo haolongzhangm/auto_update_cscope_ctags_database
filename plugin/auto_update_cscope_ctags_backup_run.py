@@ -118,7 +118,8 @@ def gen_cscope_and_ctag_file():
     gnome_osd_print('%s project update tags start' % sys.argv[1])
     os.chdir(gen_tag_dir)
     pre_create_lock_cmd = "mkdir .auto_cscope_ctags 1>/dev/null 2>&1; \
-            touch .auto_cscope_ctags/lock 1>/dev/null 2>&1"
+            touch .auto_cscope_ctags/lock 1>/dev/null 2>&1; sync ;\
+            rm .auto_cscope_ctags/cscope_detect_wait 1>/dev/null 2>&1"
     debug_backrun_python_print("now create lock now")
     os.system(pre_create_lock_cmd)
     debug_backrun_python_print("end create lock now")

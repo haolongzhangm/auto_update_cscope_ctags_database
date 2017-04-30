@@ -4,6 +4,10 @@
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
 let g:autocommands_loaded = 0
+let g:Auto_detect_cscope_need_reset = 0
+let g:cscope_reset_detect_mode = 0
+let g:vim_has_timers = 0
+"end internal use"
 
 "For debug print"
 "default value 0"
@@ -224,6 +228,12 @@ function! <SID>Auto_update_cscope_ctags(create_mode)
             let g:Create_Mode = 1
         else
             let g:Create_Mode = 0
+        endif
+
+        if 2 == a:create_mode
+            let g:cscope_reset_detect_mode = 1
+        else
+            let g:cscope_reset_detect_mode = 0
         endif
 
 	if g:Auto_update_cscope_ctags_running_status == 0 && 0 == g:Create_Mode
@@ -557,6 +567,35 @@ def main_loop():
 
     may_tags_dir = vim.eval("g:for_auto_update_cscope_ctag")
     Create_Mode_I = int(vim.eval("g:Create_Mode"))
+    cscope_reset_detect_mode_I = int(vim.eval("g:cscope_reset_detect_mode"))
+    #Fistly detect cscope reset mode
+    if 1 == cscope_reset_detect_mode_I:
+        need_stop_cscope_reset_detect_time = 0
+        debug_python_print("handle cscope reset detect timer")
+        Auto_detect_cscope_need_reset_I = int(vim.eval("g:Auto_detect_cscope_need_reset"))
+        cscope_wait_lock = may_tags_dir + "/.auto_cscope_ctags/cscope_detect_wait"
+        if 0 == Auto_detect_cscope_need_reset_I:
+            debug_python_print("stop cscope reset detect timer")
+            need_stop_cscope_reset_detect_time = 1
+        elif os.path.exists(cscope_wait_lock):
+            debug_python_print("cscope reset detect logic wait...")
+        elif 1 == check_lock_status_and_time(may_tags_dir + "/.auto_cscope_ctags/lock"):
+            debug_python_print("check time for reset cscope reset, wait....")
+        else:
+            need_stop_cscope_reset_detect_time = 1
+
+        if 1 == need_stop_cscope_reset_detect_time and 1 == int(vim.eval("g:vim_has_timers")):
+            timer_unmask_str_cmd = "let g:Auto_detect_cscope_need_reset = 0"
+            vim.command(timer_unmask_str_cmd)
+            cscope_reset_timer_id = int(vim.eval("g:cscope_reset_detect_timer"))
+            pause_cscope_reset_timer_str = "call timer_pause(%s, 1)" % cscope_reset_timer_id
+            debug_python_print("pause cscope reset detect timer cmd %s" % pause_cscope_reset_timer_str)
+            vim.command(pause_cscope_reset_timer_str)
+            cscope_reset_str = "cscope reset"
+            vim.command(cscope_reset_str)
+        return 0
+    #end detect cscope reset mode
+
     #set a err status fisrtly
     vim.command("let g:create_tag_run_py_ret_vim = '0'")
     if 1 == Create_Mode_I:
@@ -644,11 +683,26 @@ def main_loop():
 
             run_py_ret = get_backup_run_py()
             if 'null' != run_py_ret and os.path.exists(run_py_ret):
+                #when cscope detect timer may run before create lock, which will
+                #lead cscope logic wrong,so we create creat a cscope_detect_wait
+                pre_create_cscope_wait_cmd = "cd %s 1>/dev/null 2>&1; mkdir .auto_cscope_ctags 1>/dev/null 2>&1; touch .auto_cscope_ctags/cscope_detect_wait 1>/dev/null 2>&1" % may_tags_dir
+                debug_python_print("fisrtly ,create a cscope_detect_wait %s" % pre_create_cscope_wait_cmd)
+                os.system(pre_create_cscope_wait_cmd)
                 #vim script api do not support blocking time I/O, so we and '&' here
-                #why do not use vim timer: long time I/O may cause vim exit err
+                #why do not use vim timer: long time I/O may cause vim exit err,also 
+                #vim block for input(vim timer base in input thread?)
                 back_run_cmd = "python %s %s %s %s quiet &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
+
+                if 1 == int(vim.eval("g:vim_has_timers")):
+                    #after put back cmd we need sync to cscope_reset_timer
+                    timer_mask_str_cmd = "let g:Auto_detect_cscope_need_reset = 1"
+                    vim.command(timer_mask_str_cmd)
+                    cscope_reset_timer_id = int(vim.eval("g:cscope_reset_detect_timer"))
+                    unpause_cscope_reset_timer_str = "call timer_pause(%s, 0)" % cscope_reset_timer_id
+                    debug_python_print("restart cscope reset detect timer cmd %s" % unpause_cscope_reset_timer_str)
+                    vim.command(unpause_cscope_reset_timer_str)
 
         elif file_result == 0:
             debug_python_print("no need update")
@@ -673,4 +727,16 @@ endfunction
 
 if 1 == g:check_update_when_fisrt_load_vim && has('timers')
     let Fistly_load_vim_timer = timer_start(1500, 'Fistly_check_needed_update_when_vim_load',{'repeat': 1})
+endif
+
+"add a timer for auto detect cscope reset after database update"
+function! Cscope_reset_detect_timer_func(cscope_reset_detect_timer_vim)
+    "echo "call cscope reset timer""
+    call <SID>Auto_update_cscope_ctags(2)
+endfunction
+
+if has('timers')
+    let cscope_reset_detect_timer_vim = timer_start(4000, 'Cscope_reset_detect_timer_func', {'repeat': -1})
+    let g:cscope_reset_detect_timer = cscope_reset_detect_timer_vim
+    let g:vim_has_timers = 1
 endif
