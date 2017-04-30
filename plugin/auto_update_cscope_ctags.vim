@@ -509,18 +509,19 @@ def main_loop():
     vim.command("let g:create_tag_run_py_ret_vim = '0'")
     if 1 == Create_Mode_I:
         default_tag_dir = vim.eval("g:curbufferpwd")
-        ret_check_lock_status_and_time = check_lock_status_and_time(default_tag_dir + "/.auto_cscope_ctags/lock")
-        if 1 == ret_check_lock_status_and_time:
-            Warn_print("anthor update proccess go..., pls wait a moment to try ")
-            return 0
-
         print("Now try to Create cscope and ctags database")
         if not os.path.exists(default_tag_dir):
             Warn_print("invaild default_tag_dir = %s" % default_tag_dir)
             return 0
 
-        debug_python_print("creat tag: find default_tag_dir = %s" % default_tag_dir)
         (to_user_suggest_tag_dir, kernel_tree) = check_kernel_code_characteristic(default_tag_dir)
+        debug_python_print("creat tag: find default_tag_dir = %s" % to_user_suggest_tag_dir)
+        ret_check_lock_status_and_time = check_lock_status_and_time(to_user_suggest_tag_dir \
+                + "/.auto_cscope_ctags/lock")
+        if 1 == ret_check_lock_status_and_time:
+            Warn_print("anthor update proccess go..., pls wait a moment to try ")
+            return 0
+
         if not os.path.exists(to_user_suggest_tag_dir):
             Warn_print("Err happned invaild dir = %s" % to_user_suggest_tag_dir)
             return 0
