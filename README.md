@@ -1,4 +1,4 @@
-brief 
+Brief 
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----
@@ -42,6 +42,10 @@ just add <br>
 in ~/.vimrc <br>
 then run :<br>
 :PluginInstall<br>
+
+more
+-----
+remove autoload_cscope.vim if u have install this script(we add more interface in autoload_cscope_ctags.vim)
 
 
 Env check
