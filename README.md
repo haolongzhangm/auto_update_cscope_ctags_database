@@ -59,7 +59,7 @@ also suggest build vim with timers(vim --version| grep timers)<br>
 if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_fisrt_load_vim)will be disable<br>
 which will can use base function(update cscope and ctags database)<br>
 
-#build new vim for support times
+#build new vim for support timers
 -----
 a:  https://github.com/vim/vim download vim src <br>
 b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
