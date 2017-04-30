@@ -5,8 +5,12 @@ brief
 
 #auto update database if cscope connect
 -----
+after run buffer write command eg, w, we will try update database.<br>
+when already connect a cscope database,<br>
+also we can check file update(may casued by git pull , add new file or edit by notepad) <br>
+when fist load vim <br>
 
-#you can create new cscope and ctags databse by command: :Createtag
+#easy create new cscope and ctags databse by command: :Createtag
 -----
 can intelligent identificate kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
@@ -44,19 +48,39 @@ Env check
 ===
 need must install: cscope ctags sed python and vim_with_python( vim --version| grep python) <br>
 
-if you os support command: gnome-osd-client , GUI will show mesage when collect　database <br>
+if you os support command: gnome-osd-client or notify-send , GUI will show mesage when collect　database <br>
 
+also suggest build vim with timers(vim --version| grep timers)<br>
 
+if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_fisrt_load_vim)will be disable<br>
+which will can use base function(update cscope and ctags database)<br>
 
-config you vim
+#build new vim for support times
+-----
+a:  https://github.com/vim/vim download vim src <br>
+b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
+python2 <br>
+--enable-pythoninterp=yes  <br>
+--with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/   <br>
+
+python3<br>
+-enable-python3interp=yesdddd<br>
+--with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/<br>
+
+suggest  build with python2 <br>
+
+config you owner Featrue
 ===
 g:Auto_update_cscope_ctags_debug_log <br>
+-----
 default value 0<br>
 
 
+
+g:Auto_update_cscope_ctags_timer_filter<br>
+-----
 For filter Time:<br>
 default value 60<br>
-g:Auto_update_cscope_ctags_timer_filter<br>
 this time for filter modify frequency"<br>
 if you want to see database update immediately<br>
 you can modify to 10s or 1s, which I do not suggest<br>
@@ -65,6 +89,7 @@ big occupy on disk,you can override at .vimrc<br>
 
 
 g:Auto_update_cscope_ctags_lock_floor_max<br>
+-----
 default value 1800<br>
 this time for wait cscope or ctag gen tags finish<br>
 or vim closed when gen ctags run last time, <br>
@@ -76,13 +101,16 @@ you can override at .vimrc<br>
 
 
 g:auto_update_cscope_ctags_backup_run_py_dir_cache<br>
-default ~/.vim/plugin<br>
+-----
+default  '~/.vim/bundle/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags_backup_run.py'<br>
+
 you may set this in you .vimrc<br>
 for plugn run quickly, but even<br>
 you config err, we can also find it"<br>
 
 
 g:auto_run_function_when_cscope_connect<br>
+-----
 default 1<br>
 :when find cscope connect/first load<br>
 or buffers swith<br>
@@ -90,6 +118,15 @@ if you set to 0 in vimrc, <br>
 you need use command: <br>
 :Manualstartstopautoupdatedatabas<br>
 to start or stop auto update database<br>
+
+
+g:check_update_when_fisrt_load_vim<br>
+-----
+default 1<br>
+when 1, we will try to check database need update or not<br>
+eg: you add some file in project or edit src by git pull or <br>
+other editer like gedit or notepad, we can detect the update<br>
+you can disable this Feature in .vimrc<br>
 
 issue report
 ==== 
