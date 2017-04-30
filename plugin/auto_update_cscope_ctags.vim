@@ -314,13 +314,58 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
                 debug_python_print("Found update file %s" % i)
     return ret
 
+def lock_check_pid(i_lock):
+    # ret:
+    # -1 check pid failed , invaild lock need remove
+    #1 check pid success, valid lock
+    ret = 1
+    i_lock_buffer = []
+    if os.path.exists(i_lock):
+        i_lock_buffer_len = 0
+        f = open(i_lock, 'r')
+        for line in f:
+            i_lock_buffer_len = i_lock_buffer_len + 1
+            i_lock_buffer.append(line)
+        f.close()
+
+        debug_python_print("i_lock_buffer len %s" % i_lock_buffer_len)
+        if 2 == i_lock_buffer_len:
+            cmd_may_file = "/proc/%s/cmdline" % i_lock_buffer[0].strip()
+            debug_python_print("cmd_may_file = %s" % cmd_may_file)
+            if os.path.exists(cmd_may_file):
+                compare_cmd = 'null'
+                cmd_f = open(cmd_may_file, 'r')
+                for i_line in cmd_f:
+                    compare_cmd = i_line
+                    #read only one line
+                    break
+                cmd_f.close()
+                if i_lock_buffer[1].strip() == compare_cmd:
+                    debug_python_print("lock_check_pid success: really valid lock")
+                    ret = 1
+                else:
+                    debug_python_print("diff proccess = %s" % compare_cmd)
+                    ret = -1
+            else:
+                ret = -1
+                debug_python_print("pid = %s already exit" % i_lock_buffer[0].strip())
+        else:
+            ret = -1
+            debug_python_print("invaild lock")
+
+    else :
+        debug_python_print("can not find lock")
+        ret = -1
+
+    return ret
+
 def check_lock_status_and_time(lock_str):
     # ret :
     #-1, config err
     #0: lock release , 
     #1: lock hold 
     #2, lock create before systemup, may cause by system shotdown when gen tag
-    #3: lock too old, 
+    #3: lock too old, or invaild
     ret = -1
     if os.path.exists(lock_str):
         ret = 1
@@ -332,7 +377,7 @@ def check_lock_status_and_time(lock_str):
                 if 0 <= line.find('btime'):
                     btime_f = line.split()
                     break
-
+            f.close()
 
         btime_l_int = int(btime_f[1])
         debug_python_print("btime: %s" % btime_l_int)
@@ -359,8 +404,14 @@ def check_lock_status_and_time(lock_str):
             debug_python_print("Lock to old, need remove it")
             ret = 3
         else:
-            debug_python_print("Lock %s locked, wait... " % lock_str)
-            ret = 1
+            debug_python_print("need check lock pid")
+            lock_check_pid_ret =  lock_check_pid(lock_str)
+            if 1 == lock_check_pid_ret:
+                debug_python_print("Lock %s locked, wait... " % lock_str)
+                ret = 1
+            elif -1 == lock_check_pid_ret:
+                debug_python_print("find a invaild lock, remove it")
+                ret = 3
     else:
         debug_python_print("Lock %s already unlock" % lock_str)
         ret = 0
@@ -387,6 +438,7 @@ def check_cscope_files_type(directory):
             head_of_check_file.append(line.replace('/$', '').strip())
             if max_read_line == i:
                 break
+        f.close()
 
         if '-k' == head_of_check_file[0]:
             debug_python_print('this is a linux kernel project')
@@ -572,7 +624,7 @@ def main_loop():
         return 0
 
     if 3 == check_lock_status_and_time_ret or 2 == check_lock_status_and_time_ret:
-        #checn file exists again for use rm command is so danger
+        #check file exists again for use rm command is so danger
         lock_file = "%s/.auto_cscope_ctags/lock" % may_tags_dir
         if os.path.exists(lock_file):
             rm_lock_cmd = "rm %s  1>/dev/null  2>&1" % lock_file

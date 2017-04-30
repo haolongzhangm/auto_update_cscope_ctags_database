@@ -122,6 +122,34 @@ def gen_cscope_and_ctag_file():
     debug_backrun_python_print("now create lock now")
     os.system(pre_create_lock_cmd)
     debug_backrun_python_print("end create lock now")
+
+    if os.path.exists('.auto_cscope_ctags/lock'):
+        write_to_lock = 0
+        self_name  = ''
+        debug_backrun_python_print("now write pid to lock")
+        self_pid = os.getpid()
+        self_cmd_str = "/proc/%s/cmdline" % self_pid
+        if os.path.exists(self_cmd_str):
+            f = open(self_cmd_str, 'r')
+            for i_line in f:
+                self_name = i_line
+                #only read fistl line
+                write_to_lock = 1
+                break
+        else:
+            write_to_lock = 0
+
+        if 1 == write_to_lock:
+            str_to_lock = "%s\n%s\n" % (self_pid, self_name)
+            debug_backrun_python_print("str_to_lock %s" % str_to_lock)
+            f = open('.auto_cscope_ctags/lock', 'w+')
+            f.write(str_to_lock)
+            f.close()
+
+        debug_backrun_python_print("end write pid to lock")
+    else:
+        Warnin_print("create lock failed, may caused by I/O permmison!")
+
     start_time = time.time()
     print_cscope_and_ctags_info = 0
     if len(sys.argv) == 5:
