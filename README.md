@@ -5,16 +5,15 @@ Brief
 
 #auto update database if cscope connect
 -----
-after run buffer write command eg, w, we will try update database.<br>
-when already connect a cscope database,<br>
+After run buffer write command eg, w, we will try update database if already connect a cscope database,<br>
 also we can check file update(may casued by git pull , add new file or edit by notepad) <br>
-when fist load vim <br>
+when fistly load vim <br>
 
 #easy create new cscope and ctags databse by command: :Createtag
 -----
 can intelligent identificate kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
-we can intelligent find it is a kernel tree, then call make cscope [ARCH] for gen <br>
+we can intelligent detect it is a kernel tree, then call make cscope [ARCH] for gen <br>
 kernel database<br>
 
 suppor ARCH:<br>
@@ -45,7 +44,8 @@ then run :<br>
 
 more
 -----
-remove autoload_cscope.vim if u have install this script(we add more interface in autoload_cscope_ctags.vim)
+remove autoload_cscope.vim if u have install this script(we add more interface in autoload_cscope_ctags.vim,<br> 
+which base on autoload_cscope.vim )<br>
 
 
 Env check
@@ -63,17 +63,20 @@ which will can use base function(update cscope and ctags database)<br>
 -----
 a:  https://github.com/vim/vim download vim src <br>
 b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
+
+for python please choose python2 or python3  <br>
+
 python2 <br>
 --enable-pythoninterp=yes  <br>
 --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/   <br>
 
 python3<br>
--enable-python3interp=yesdddd<br>
+-enable-python3interp=yes<br>
 --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/<br>
 
 suggest  build with python2 <br>
 
-config you owner Featrue
+config you own prefer Featrue(Do not config anything, plugn also work fine)
 ===
 g:Auto_update_cscope_ctags_debug_log <br>
 -----
@@ -137,6 +140,7 @@ issue report
 *1:enable  'let g:Auto_update_cscope_ctags_debug_log = 1' in ~/.vimrc <br>
 *2:reopen vim , reproducte issue<br>
 *3:upload logfile : /tmp/.Auto_update_cscope_ctags_debug_back_run.log /tmp/.Auto_update_cscope_ctags_debug_log.log<br>
+*4:also upload err info in vim eidt window
 
 
 
