@@ -167,10 +167,13 @@ def gen_cscope_and_ctag_file():
 
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (print_cscope_and_ctags_info, start_time))
-    ctags_task = threading.Thread(target = ctags_task_func, args = (print_cscope_and_ctags_info, start_time))
+    ctags_task = threading.Thread(target = ctags_task_func, args = (print_cscope_and_ctags_info, start_time, cscope_task))
 
     cscope_task.start()
     ctags_task.start()
+    if 1 == print_cscope_and_ctags_info:
+        Warnin_print("cscope_task = %s" % cscope_task)
+        Warnin_print("ctags_task = %s" % ctags_task)
 
     cscope_task.join()
     ctags_task.join()
@@ -235,11 +238,16 @@ def cscope_task_func(show_message_enable, s_time):
             debug_backrun_python_print(use_time_str)
         debug_backrun_python_print("end for cscope")
 
-def ctags_task_func(show_message_enable, s_time):
+def ctags_task_func(show_message_enable, s_time, cscope_task_id):
 
     #wait cscope_task_func touch cscope.files
     i = 0
     while ( (not os.path.exists('cscope.files')) or s_time > os.stat('cscope.files').st_mtime):
+        if not cscope_task_id.isAlive():
+            Warnin_print("ERR happened, may try to gen tags at a null dir" )
+            clear_lock_i()
+            return -1
+
         time.sleep(0.2)
         i = i + 1
         debug_backrun_python_print("wait cscope_task_func touch cscope.files")
