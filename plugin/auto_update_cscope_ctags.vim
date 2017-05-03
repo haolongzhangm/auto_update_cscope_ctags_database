@@ -438,10 +438,6 @@ def check_cscope_files_type(directory):
         debug_python_print("Check cscope type!")
         #try to read fisrt three line from cscope.files
         f = open(check_file, 'r')
-        if 0 == os.path.getsize(check_file):
-            Warn_print("ERR: invaild file %s " % check_file)
-            return ret
-
         for line in f:
             i = i+1
             debug_python_print('line %s in csocpe.files = %s' % (i, line))
@@ -449,6 +445,10 @@ def check_cscope_files_type(directory):
             if max_read_line == i:
                 break
         f.close()
+
+        if '' == head_of_check_file[0]:
+            Warn_print("ERR: invaild file %s " % check_file)
+            return ret
 
         if '-k' == head_of_check_file[0]:
             debug_python_print('this is a linux kernel project')
@@ -678,7 +678,7 @@ def main_loop():
         if file_result > 0:
             handle_arch = check_cscope_files_type(may_tags_dir)
             if handle_arch not in arch_parameter_list:
-                Warn_print("Err: ARCH: %s do not support" % handle_arch)
+                Warn_print("Err: ARCH: %s do not support or err happned" % handle_arch)
                 return -1
 
             run_py_ret = get_backup_run_py()
