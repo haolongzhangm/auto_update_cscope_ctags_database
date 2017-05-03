@@ -172,6 +172,7 @@ def gen_cscope_and_ctag_file():
     cscope_task.start()
     ctags_task.start()
     if 1 == print_cscope_and_ctags_info:
+        Warnin_print("")
         Warnin_print("cscope_task = %s" % cscope_task)
         Warnin_print("ctags_task = %s" % ctags_task)
 
