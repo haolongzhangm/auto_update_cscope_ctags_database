@@ -1,4 +1,4 @@
-Brief 
+Brief (1.0)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----
@@ -61,6 +61,8 @@ which will can use base function(update cscope and ctags database)<br>
 
 #build new vim for support timers
 -----
+0: before build vim,suggest install: （ubuntu）sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
+tcl-dev libperl-dev libncurses5-dev  <br>
 a:  https://github.com/vim/vim download vim src <br>
 b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
 
@@ -75,12 +77,16 @@ python3<br>
 --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/<br>
 
 suggest  build with python2 <br>
+c:make -j2<br>
+d:sudo make install <br>
+e:open a new terminal input command: vim --version to check vim support feature<br>
 
 config you own prefer Featrue(Do not config anything, plugn also work fine)
 ===
 g:Auto_update_cscope_ctags_debug_log <br>
 -----
 default value 0<br>
+
 
 
 
@@ -141,6 +147,4 @@ issue report
 *2:reopen vim , reproducte issue<br>
 *3:upload logfile : /tmp/.Auto_update_cscope_ctags_debug_back_run.log /tmp/.Auto_update_cscope_ctags_debug_log.log<br>
 *4:also upload err info in vim eidt window
-
-
 
