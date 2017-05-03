@@ -1,5 +1,6 @@
 "author : haolong.zhang@ck-telecom.com"
 "v0.5: 20170426 init func"
+"v1.0: 20170503 finish for multithreading for gen cscope and ctag database"
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
