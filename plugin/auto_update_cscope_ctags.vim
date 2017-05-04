@@ -73,6 +73,7 @@ if !has('timers')
     echo "Feature ('auto reset cscope' and 'check_update_when_fisrt_load_vim') will disabled"
     echo "just support base function update cscope and ctags"
     echo "try to update you vim from github: https://github.com/vim/vim to remove this warning"
+    echo "more detail, pls check README"
 endif
 
 command! -nargs=0 -bar Manualstartstopautoupdatedatabas
@@ -219,6 +220,7 @@ vim.command(find_command_str)
 EOF
 else
 	echo 'Pls build vim with python'
+        echo "more detail, pls check README"
 endif
 endfunction
 
@@ -715,6 +717,7 @@ main_loop()
 EOF
 else
     echo "auto update cscope ctags err: Pls build vim with python"
+    echo "more detail, pls check README"
 endif
 
 endfunction
