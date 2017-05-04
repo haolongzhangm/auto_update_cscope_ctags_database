@@ -1,4 +1,4 @@
-Brief (1.0)
+Brief (V1.0)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----
@@ -8,8 +8,18 @@ Brief (1.0)
 After run buffer write command eg, w, we will try update database if already connect a cscope database,<br>
 also we can check file update(may casued by git pull , add new file or edit by notepad) <br>
 when fistly load vim <br>
+if U do not want vim check database update when firstly load vim  <br>
+add below in ~/.vimrc <br>
+let g:check_update_when_fisrt_load_vim = 0 <br>
 
-#easy create new cscope and ctags databse by command: :Createtag
+if U do not want to auto update database during edit you file <br>
+add below in ~/.vimrc <br>
+let g:auto_run_function_when_cscope_connect = 0 <br>
+then you can run command : <br>
+:Manualstartstopautoupdatedatabas<br>
+to start or stop auto update database<br>
+
+#easy create new cscope and ctags databse by command  :Createtag
 -----
 can intelligent identificate kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
@@ -59,10 +69,10 @@ also suggest build vim with timers(vim --version| grep timers)<br>
 if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_fisrt_load_vim)will be disable<br>
 which will can use base function(update cscope and ctags database)<br>
 
-#build new vim for support timers
+#build new vim for support timers and python
 -----
 0: before build vim,suggest install: （ubuntu）sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
-tcl-dev libperl-dev libncurses5-dev  <br>
+tcl-dev libperl-dev libncurses5-dev python-dev python3-dev(if U use python3) <br>
 a:  https://github.com/vim/vim download vim src <br>
 b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
 
@@ -70,11 +80,11 @@ for python please choose python2 or python3  <br>
 
 python2 <br>
 --enable-pythoninterp=yes  <br>
---with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/   <br>
+--with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
 
 python3<br>
 -enable-python3interp=yes<br>
---with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/<br>
+--with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
 
 suggest  build with python2 <br>
 c:make -j2<br>
