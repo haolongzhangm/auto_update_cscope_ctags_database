@@ -37,6 +37,15 @@ if we can not  match kernel tree we will use  find command to gen needed files 
 Install
 ===
 
+#Install before todo
+-----
+U need remove old config like: <br>
+1: remove hard config database in vimrc eg: set tag=tags; <br>
+2: remove hard config database in vimrc eg: cs add xxx
+3: also need remove database manage plugn if U used
+ps: 1 2 3 function already be integrated in "auto_update_cscope_ctags_database"
+
+
 #ways A
 -----
 git clone git@github.com:haolongzhangm/auto_update_cscope_ctags_database.git <br>
