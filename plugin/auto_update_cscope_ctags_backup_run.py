@@ -243,7 +243,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
 
     #wait cscope_task_func touch cscope.files
     i = 0
-    while ( (not os.path.exists('cscope.files')) or s_time > os.stat('cscope.files').st_mtime):
+    while ( (not os.path.exists('cscope.files')) or 1 >= os.path.getsize('cscope.files')):
         if not cscope_task_id.isAlive():
             Warnin_print("ERR happened, may try to gen tags at a null dir" )
             clear_lock_i()
