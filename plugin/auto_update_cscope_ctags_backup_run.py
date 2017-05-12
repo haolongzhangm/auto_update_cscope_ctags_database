@@ -21,6 +21,8 @@ needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
 global_back_run_log_file = '/tmp/.Auto_update_cscope_ctags_debug_back_run.log'
 
+global_debug_enable = -1
+
 second_parameter_list = ['cscope_only', 'cscope_and_ctags']
 fifth_parameter_list = ['print_message', 'quiet']
 def Usage():
@@ -84,13 +86,28 @@ def debug_backrun_python_print(str):
     user_name = getpass.getuser()
     vimrc_file = '/home/%s/.vimrc' % user_name
 
-    if os.path.exists(vimrc_file):
-        if vimrc_file.find('let g:Auto_update_cscope_ctags_debug_log = 1'):
-            f = open(global_back_run_log_file,'a')
-            print >> f, '\n'
-            print >> f, time.localtime(time.time())
-            print >> f, str
+    global global_debug_enable
+    if -1 == global_debug_enable:
+        global_debug_enable = 0
+        if os.path.exists(vimrc_file):
+            try:
+                f = open(vimrc_file, 'r')
+            except:
+                return 0
+
+            for line in f:
+                if 0 <= line.find('let g:Auto_update_cscope_ctags_debug_log = 1'):
+                    global_debug_enable = 1
+                    break
+
             f.close()
+
+    if 1 == global_debug_enable:
+        f = open(global_back_run_log_file,'a')
+        print >> f, '\n'
+        print >> f, time.localtime(time.time())
+        print >> f, str
+        f.close()
     else:
         return 0
 
