@@ -281,22 +281,36 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print("now for ctag")
         debug_backrun_python_print("firtly handle cscope.files")
         handle_tags_files_cmd = "cp cscope.files tags.files; "
+        diff_size = 0
         if not 'normal' == sys.argv[1]:
             handle_tags_files_cmd = handle_tags_files_cmd + "sed -i '1,2d' tags.files"
+            #-k -q line size = 8
+            diff_size = 8
 
         debug_backrun_python_print(handle_tags_files_cmd)
         os.system(handle_tags_files_cmd)
 
         if 0 == show_message_enable:
-            ctags_cmd = "ctags -R --fields=+lS -L tags.files -f .auto_cscope_ctags/tags; rm tags.files"
+            ctags_cmd = "ctags -R --fields=+lS -L tags.files -f .auto_cscope_ctags/tags"
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
             ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
         else:
-            ctags_cmd = "ctags -R --fields=+lS -L tags.files -f tags; rm tags.files"
+            ctags_cmd = "ctags -R --fields=+lS -L tags.files -f tags"
             Warnin_print(ctags_cmd)
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
         os.system(ctags_cmd)
+
+        #double check uniformity between cscope.files and ctags.files
+        while diff_size < (os.path.getsize('./cscope.files') - os.path.getsize('./tags.files')):
+            if 1 == show_message_enable:
+                Warnin_print("max than diff_size, we need update ctags again")
+            else:
+                debug_backrun_python_print("max than diff_size, we need update ctags again")
+            os.system(handle_tags_files_cmd)
+            os.system(ctags_cmd)
+
+        os.system("rm tags.files")
         ctags_end_time  = time.time()
         ctags_use_time_str = "Ctags Use time = %s s" % (ctags_end_time - s_time)
         if 1 == show_message_enable:
