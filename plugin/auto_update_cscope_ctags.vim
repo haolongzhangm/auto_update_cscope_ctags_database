@@ -2,6 +2,7 @@
 "v0.5: 20170426 init func"
 "v1.0: 20170503 finish for multithreading for gen cscope and ctag database"
 "v1.0.1: 20170512 fix v1.0 issue"
+"v2.0  : 20170519 add command Manualupdatedatabaseonetime
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
@@ -79,6 +80,9 @@ endif
 
 command! -nargs=0 -bar Manualstartstopautoupdatedatabas
     \  call <SID>Manual_start_stop_auto_update_database(0)
+
+command! -nargs=0 -bar Manualupdatedatabaseonetime
+    \  call <SID>Auto_update_cscope_ctags(3)
 
 command! -nargs=0 -bar Createtag
     \  call <SID>Manual_start_stop_auto_update_database(1)
@@ -240,7 +244,9 @@ function! <SID>Auto_update_cscope_ctags(create_mode)
             let g:cscope_reset_detect_mode = 0
         endif
 
-	if g:Auto_update_cscope_ctags_running_status == 0 && 0 == g:Create_Mode
+""when args = 3, we try to update database once, for some user just want to update
+""database onetime, by command : :Manualupdatedatabaseonetime
+        if g:Auto_update_cscope_ctags_running_status == 0 && 0 == g:Create_Mode && 3 != a:create_mode && 2 != a:create_mode
 		"echo "Already stop, just return""
 		return 0
 	endif
