@@ -1,4 +1,4 @@
-Brief (V1.0)
+Brief (V2.0)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----
@@ -18,6 +18,10 @@ let g:auto_run_function_when_cscope_connect = 0 <br>
 then you can run command : <br>
 :Manualstartstopautoupdatedatabas<br>
 to start or stop auto update database<br>
+
+we also add a command :Manualupdatedatabaseonetime <br>
+which porvide a chance to update database onetime <br>
+espiaclly, user disable g:auto_run_function_when_cscope_connect = 0  <br>
 
 #easy create new cscope and ctags databse by command  :Createtag
 -----
