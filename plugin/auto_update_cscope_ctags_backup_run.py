@@ -308,7 +308,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         os.system(handle_tags_files_cmd)
 
         if 0 == show_message_enable:
-            ctags_cmd = "ctags -R --fields=+lS --extra=+f -L tags.files -f .auto_cscope_ctags/tags"
+            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files -f .auto_cscope_ctags/tags"
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
             ctags_cmd = ctags_cmd + " -I fs_initcall+,subsys_initcall+,device_initcall+,core_initcall+,arch_initcall"
             ctags_cmd = ctags_cmd + " -I late_initcall+,postcore_initcall+,console_initcall+,early_initcall"
@@ -318,7 +318,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
             ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
         else:
-            ctags_cmd = "ctags -R --fields=+lS --extra=+f -L tags.files -f tags"
+            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files -f tags"
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
             ctags_cmd = ctags_cmd + " -I fs_initcall+,subsys_initcall+,device_initcall+,core_initcall+,arch_initcall"
             ctags_cmd = ctags_cmd + " -I late_initcall+,postcore_initcall+,console_initcall+,early_initcall"
