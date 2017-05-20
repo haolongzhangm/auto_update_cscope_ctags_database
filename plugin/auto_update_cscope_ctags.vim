@@ -733,7 +733,7 @@ endfunction
 "add a timer later for 1.5s wait vim hava a chance to load cscope database"
 function! Fistly_check_needed_update_when_vim_load(Fistly_load_vim_timer)
     "echo "Fistly check database update when load vim""
-    call <SID>Auto_update_cscope_ctags(0)
+    call <SID>Auto_update_cscope_ctags(3)
 endfunction
 
 if 1 == g:check_update_when_fisrt_load_vim && has('timers')
