@@ -307,24 +307,23 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print(handle_tags_files_cmd)
         os.system(handle_tags_files_cmd)
 
-        if 0 == show_message_enable:
-            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files -f .auto_cscope_ctags/tags"
+        ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+        #kernel mode
+        if 'normal' != sys.argv[1]:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
             ctags_cmd = ctags_cmd + " -I fs_initcall+,subsys_initcall+,device_initcall+,core_initcall+,arch_initcall"
             ctags_cmd = ctags_cmd + " -I late_initcall+,postcore_initcall+,console_initcall+,early_initcall"
             ctags_cmd = ctags_cmd + " -I __initcall+,core_initcall_sync+,subsys_initcall_sync+,fs_initcall_sync"
             ctags_cmd = ctags_cmd + " -I late_initcall_sync+,arch_initcall_sync+,rootfs_initcall+,pure_initcall+,__exitcall"
             ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
+            ctags_cmd = ctags_cmd + " --langmap=c:+.h"
+        #slient mode
+        if 0 == show_message_enable:
+            ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
             ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
         else:
-            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files -f tags"
-            ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
-            ctags_cmd = ctags_cmd + " -I fs_initcall+,subsys_initcall+,device_initcall+,core_initcall+,arch_initcall"
-            ctags_cmd = ctags_cmd + " -I late_initcall+,postcore_initcall+,console_initcall+,early_initcall"
-            ctags_cmd = ctags_cmd + " -I __initcall+,core_initcall_sync+,subsys_initcall_sync+,fs_initcall_sync"
-            ctags_cmd = ctags_cmd + " -I late_initcall_sync+,arch_initcall_sync+,rootfs_initcall+,pure_initcall+,__exitcall"
-            ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
+            ctags_cmd = ctags_cmd + " -f tags"
             Warnin_print(ctags_cmd)
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
