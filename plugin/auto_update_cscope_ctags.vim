@@ -11,6 +11,8 @@ let g:autocommands_loaded = 0
 let g:Auto_detect_cscope_need_reset = 0
 let g:cscope_reset_detect_mode = 0
 let g:vim_has_timers = 0
+let g:in_cmdline_mode_t = 0
+let g:in_cmdline_mode_t_load = 0
 "end internal use"
 
 "For debug print"
@@ -77,6 +79,12 @@ if !has('timers')
     echo "just support base function update cscope and ctags"
     echo "try to update you vim from github: https://github.com/vim/vim to remove this warning"
     echo "more detail, pls check README"
+endif
+
+if g:in_cmdline_mode_t_load == 0
+  let g:in_cmdline_mode_t_load = 1
+  autocmd CmdwinEnter * let g:in_cmdline_mode_t = 1
+  autocmd CmdwinLeave * let g:in_cmdline_mode_t = 0
 endif
 
 command! -nargs=0 -bar Manualstartstopautoupdatedatabas
@@ -584,6 +592,12 @@ def main_loop():
         need_stop_cscope_reset_detect_time = 0
         debug_python_print("handle cscope reset detect timer")
         Auto_detect_cscope_need_reset_I = int(vim.eval("g:Auto_detect_cscope_need_reset"))
+
+        in_cmdline_mode = int(vim.eval("g:in_cmdline_mode_t"))
+        if 1 == in_cmdline_mode:
+            debug_python_print("in cmdline mode, wait...")
+            return 0
+
         cscope_wait_lock = may_tags_dir + "/.auto_cscope_ctags/cscope_detect_wait"
         if 0 == Auto_detect_cscope_need_reset_I:
             debug_python_print("stop cscope reset detect timer")
