@@ -4,6 +4,7 @@
 "v1.0.1: 20170512 fix v1.0 issue"
 "v2.0  : 20170519 add command Manualupdatedatabaseonetime
 "v2.0.1: 20170519 fix v2.0 issue
+"v2.0.2: 20170524 fix v2.0 issue and optimize ctags args
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
