@@ -5,6 +5,7 @@
 "v2.0  : 20170519 add command Manualupdatedatabaseonetime
 "v2.0.1: 20170519 fix v2.0 issue
 "v2.0.2: 20170524 fix v2.0 issue and optimize ctags args
+"v2.0.3: 20170719 add more file type
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
@@ -311,7 +312,8 @@ def Warn_print(str_t):
 def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 '.java', '.sh', '.mk', '.prop', '.xml', 'Makefile', '.rc', 'platform', \
 'Drivers', '.scons', '.api', '.tla', '.smh', '.smi', '.smt', '.idl', '.te', \
-'.py', '.S']):
+'.py', '.S', '.tpl', '.css', '.js', '.txt', 'proto', '.md' '.conf', '.json', \
+'BUILD', '.bzl', 'BUILD']):
 
     ret = 0
     cmp_file = directory + '/cscope.files'

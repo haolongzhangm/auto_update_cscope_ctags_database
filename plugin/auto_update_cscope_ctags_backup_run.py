@@ -15,7 +15,9 @@ arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
 care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh', 
         '*.mk', '*.prop', '*.xml', 'Makefile', '*.rc', 'platform', 
         'Drivers', '*.scons', '*.api', '*.tla', '*.smh', '*.smi', 
-        '*.smt', '*.idl', '*.te', '*.py', '*.S']
+        '*.smt', '*.idl', '*.te', '*.py', '*.S', '*.tpl', '*.css',
+        '*.js', '*.txt', '*.proto', '*.md', '*.conf', '*.json',
+        '*.BUILD', '*.bzl', 'BUILD']
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
