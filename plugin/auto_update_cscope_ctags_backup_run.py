@@ -264,7 +264,7 @@ def cscope_task_func(show_message_enable, s_time):
                     for dir_i in pythonlib_install_i_dir:
                         if os.path.exists(dir_i):
                             debug_backrun_python_print('now handle pythonlib %s' % dir_i)
-                            normal_cmd = normal_cmd + "; find %s -name *.py >> cscope.files" % dir_i
+                            normal_cmd = normal_cmd + "; find %s -name '*.py' >> cscope.files" % dir_i
 
         normal_cmd = normal_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
         if 0 == show_message_enable:

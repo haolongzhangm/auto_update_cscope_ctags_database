@@ -250,7 +250,7 @@ augroup autoload_cscope
  au BufUnload *.idl    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.sh    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.te    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
- au BufUnload *.py    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ "au BufUnload *.py    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.mak    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.tpl    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.css    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
