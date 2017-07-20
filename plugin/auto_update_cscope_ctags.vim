@@ -6,6 +6,7 @@
 "v2.0.1: 20170519 fix v2.0 issue
 "v2.0.2: 20170524 fix v2.0 issue and optimize ctags args
 "v2.0.3: 20170719 add more file type
+"v2.0.4: 20170720 support python lib
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
