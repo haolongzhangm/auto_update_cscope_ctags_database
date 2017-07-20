@@ -25,6 +25,13 @@ global_back_run_log_file = '/tmp/.Auto_update_cscope_ctags_debug_back_run.log'
 
 global_debug_enable = -1
 
+#you may config this dir, if you change the
+#python default install dir, eg MAC os may
+#need config this str
+#global_add_pythonlib = False
+global_add_pythonlib = True
+global_pythonlib_dir_str = ['/usr/lib/', '/usr/local/lib/']
+
 second_parameter_list = ['cscope_only', 'cscope_and_ctags']
 fifth_parameter_list = ['print_message', 'quiet']
 def Usage():
@@ -52,8 +59,22 @@ def check_args():
             Warnin_print(fifth_parameter_list)
             Usage()
 
-def check_os_cmd_exist(str):
+def find_python_install_lib():
+    valid_python_lib_dir = False
+    pythonlib_install_i = []
+    for dir_i in global_pythonlib_dir_str:
+        if os.path.exists(dir_i):
+            i_list = os.listdir(dir_i)
+            for i in i_list:
+                if 'python' in i:
+                    pythonlib_install_i.append(dir_i+i)
 
+    if len(pythonlib_install_i) > 0:
+        valid_python_lib_dir = True
+
+    return (valid_python_lib_dir, pythonlib_install_i)
+
+def check_os_cmd_exist(str):
     ret = 0
     popen_str = "which " + str + ' 2>&1'
     debug_backrun_python_print("popen_str = %s" % popen_str)
@@ -61,6 +82,18 @@ def check_os_cmd_exist(str):
         ret = 0
     else:
         ret = 1
+
+    return ret
+
+#if find match filetyle, will return true
+def check_include_filetyle_or_not(filetyle_str):
+    ret = False
+    popen_str = "find -name " + filetyle_str + ' 2>&1'
+    debug_backrun_python_print("popen_str = %s" % popen_str)
+    if '' == os.popen(popen_str).read():
+        ret = False
+    else:
+        ret = True
 
     return ret
 
@@ -223,6 +256,16 @@ def cscope_task_func(show_message_enable, s_time):
 
         normal_cmd = normal_cmd + " -o -type f -name '*config'"
         normal_cmd = normal_cmd + "> cscope.files "
+        if global_add_pythonlib:
+            if check_include_filetyle_or_not('*.py'):
+                debug_backrun_python_print('find python file, try to add pythonlib file...')
+                (valid_install_dir, pythonlib_install_i_dir) = find_python_install_lib()
+                if valid_install_dir:
+                    for dir_i in pythonlib_install_i_dir:
+                        if os.path.exists(dir_i):
+                            debug_backrun_python_print('now handle pythonlib %s' % dir_i)
+                            normal_cmd = normal_cmd + "; find %s -name *.py >> cscope.files" % dir_i
+
         normal_cmd = normal_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
         if 0 == show_message_enable:
             normal_cmd = normal_cmd + " 1>/dev/null  2>&1"
