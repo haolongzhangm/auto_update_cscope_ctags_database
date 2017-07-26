@@ -68,19 +68,19 @@ if !exists('g:auto_run_function_when_cscope_connect')
         let g:auto_run_function_when_cscope_connect = 1
 endif
 
-"g:check_update_when_fisrt_load_vim"
+"g:check_update_when_first_load_vim"
 "default 1"
 "           when 1, we will try to check database need update or not"
 "           eg: you add some file in project or edit src by git pull or "
 "           other editer like gedit or notepad, we can detect the update"
 "           you can disable this Feature in .vimrc"
-if !exists('g:check_update_when_fisrt_load_vim')
-        let g:check_update_when_fisrt_load_vim = 1
+if !exists('g:check_update_when_first_load_vim')
+        let g:check_update_when_first_load_vim = 1
 endif
 
 if !has('timers')
     echo "Warning: you vim do not support timer"
-    echo "Feature ('auto reset cscope' and 'check_update_when_fisrt_load_vim') will disabled"
+    echo "Feature ('auto reset cscope' and 'check_update_when_first_load_vim') will disabled"
     echo "just support base function update cscope and ctags"
     echo "try to update you vim from github: https://github.com/vim/vim to remove this warning"
     echo "more detail, pls check README"
@@ -461,7 +461,7 @@ def check_cscope_files_type(directory):
     check_file = directory + '/cscope.files'
     if os.path.exists(check_file):
         debug_python_print("Check cscope type!")
-        #try to read fisrt three line from cscope.files
+        #try to read first three line from cscope.files
         f = open(check_file, 'r')
         for line in f:
             i = i+1
@@ -627,7 +627,7 @@ def main_loop():
         return 0
     #end detect cscope reset mode
 
-    #set a err status fisrtly
+    #set a err status firstly
     vim.command("let g:create_tag_run_py_ret_vim = '0'")
     if 1 == Create_Mode_I:
         default_tag_dir = vim.eval("g:curbufferpwd")
@@ -717,7 +717,7 @@ def main_loop():
                 #when cscope detect timer may run before create lock, which will
                 #lead cscope logic wrong,so we create creat a cscope_detect_wait
                 pre_create_cscope_wait_cmd = "cd %s 1>/dev/null 2>&1; mkdir .auto_cscope_ctags 1>/dev/null 2>&1; touch .auto_cscope_ctags/cscope_detect_wait 1>/dev/null 2>&1" % may_tags_dir
-                debug_python_print("fisrtly ,create a cscope_detect_wait %s" % pre_create_cscope_wait_cmd)
+                debug_python_print("firstly ,create a cscope_detect_wait %s" % pre_create_cscope_wait_cmd)
                 os.system(pre_create_cscope_wait_cmd)
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
@@ -757,7 +757,7 @@ function! Fistly_check_needed_update_when_vim_load(Fistly_load_vim_timer)
     call <SID>Auto_update_cscope_ctags(3)
 endfunction
 
-if 1 == g:check_update_when_fisrt_load_vim && has('timers')
+if 1 == g:check_update_when_first_load_vim && has('timers')
     let Fistly_load_vim_timer = timer_start(1500, 'Fistly_check_needed_update_when_vim_load',{'repeat': 1})
 endif
 

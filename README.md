@@ -10,7 +10,7 @@ also we can check file update(may casued by git pull , add new file or edit by n
 when fistly load vim <br>
 if U do not want vim check database update when firstly load vim  <br>
 add below in ~/.vimrc <br>
-let g:check_update_when_fisrt_load_vim = 0 <br>
+let g:check_update_when_first_load_vim = 0 <br>
 
 if U do not want to auto update database during edit you file <br>
 add below in ~/.vimrc <br>
@@ -79,7 +79,7 @@ if you os support command: gnome-osd-client or notify-send , GUI will show mesag
 
 also suggest build vim with timers(vim --version| grep timers)<br>
 
-if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_fisrt_load_vim)will be disable<br>
+if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_first_load_vim)will be disable<br>
 which will can use base function(update cscope and ctags database)<br>
 
 #build new vim for support timers and python
@@ -156,7 +156,7 @@ you need use command: <br>
 to start or stop auto update database<br>
 
 
-g:check_update_when_fisrt_load_vim<br>
+g:check_update_when_first_load_vim<br>
 -----
 default 1<br>
 when 1, we will try to check database need update or not<br>
