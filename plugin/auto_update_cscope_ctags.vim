@@ -9,6 +9,7 @@
 "v2.0.4: 20170720 support python lib
 "v2.0.5: 20170721 find issue fix, python file leave database logic
 "v2.0.6: 20170724 type file issue fix, care_file_type * include
+"v3.0:   20170727 support user config soft link file
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
