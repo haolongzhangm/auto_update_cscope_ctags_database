@@ -36,12 +36,12 @@ second_parameter_list = ['cscope_only', 'cscope_and_ctags']
 fifth_parameter_list = ['print_message', 'quiet']
 def Usage():
     Warnin_print('v1.0')
-    Warnin_print('python auto_update_cscope_ctags_backup_run.py [ARCH] [tags_type] [pwd/default .] [quiet_or_not]')
+    Warnin_print('python auto_update_cscope_ctags_backup_run.py [ARCH] [tags_type] [pwd/default .] [quiet_or_not] [soft_link_conf]')
     exit()
 
 def check_args():
-    if len(sys.argv) != 3 and len(sys.argv) != 4 and len(sys.argv) != 5:
-        Warnin_print('need 2 or 3argv or 4 argv')
+    if len(sys.argv) != 4 and len(sys.argv) != 5 and len(sys.argv) != 6:
+        Warnin_print('need 3 or 4argv or 5argv')
         Usage()
 
     if sys.argv[1] not in arch_parameter_list:
@@ -53,9 +53,9 @@ def check_args():
         Warnin_print('second_parameter_list onlys support:')
         Warnin_print(second_parameter_list)
         Usage()
-    if len(sys.argv) == 5:
+    if len(sys.argv) == 6:
         if sys.argv[4] not in fifth_parameter_list:
-            Warnin_print('fifth_parameter_list: only support:')
+            Warnin_print('fifth_parameter_first_parm_list: only support:')
             Warnin_print(fifth_parameter_list)
             Usage()
 
@@ -154,7 +154,8 @@ def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
     #or not kernel code 
     gen_tag_dir = './'
-    if len(sys.argv) == 4 or len(sys.argv) == 5:
+    support_soft_link = 'no'
+    if len(sys.argv) == 4 or len(sys.argv) == 5 or len(sys.argv) == 6:
         gen_tag_dir = sys.argv[3]
 
     if not os.path.exists(gen_tag_dir):
@@ -206,7 +207,8 @@ def gen_cscope_and_ctag_file():
 
     start_time = time.time()
     print_cscope_and_ctags_info = 0
-    if len(sys.argv) == 5:
+    if len(sys.argv) == 6:
+        support_soft_link = sys.argv[5]
         if 'quiet' == sys.argv[4]:
             debug_backrun_python_print("no message print")
             print_cscope_and_ctags_info = 0
@@ -216,6 +218,15 @@ def gen_cscope_and_ctag_file():
     else:
         debug_backrun_python_print("show print_message")
         print_cscope_and_ctags_info = 1
+
+    if 'yes' == support_soft_link:
+        mark_soft_link_exe = "touch .auto_cscope_ctags/.enable_soft_link_file 1>/dev/null 2>&1"
+    elif 'no' == support_soft_link:
+        mark_soft_link_exe = "rm .auto_cscope_ctags/.enable_soft_link_file 1>/dev/null 2>&1"
+
+    if 'yes' == support_soft_link or 'no' == support_soft_link:
+        debug_backrun_python_print(mark_soft_link_exe)
+        os.system(mark_soft_link_exe)
 
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (print_cscope_and_ctags_info, start_time))
@@ -250,7 +261,11 @@ def clear_lock_i():
 def cscope_task_func(show_message_enable, s_time):
 
     if 'normal' == sys.argv[1]:
-        normal_cmd = "find . -name '*.c' "
+        normal_cmd = "find"
+        if os.path.exists('./.auto_cscope_ctags/.enable_soft_link_file'):
+            normal_cmd = normal_cmd + " -L "
+
+        normal_cmd = normal_cmd + " . -name '*.c' "
         for i_care_type in care_file_type:
             normal_cmd = normal_cmd + " -o -name " + '\'' + i_care_type + '\''
 

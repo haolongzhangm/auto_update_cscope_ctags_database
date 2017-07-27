@@ -18,6 +18,7 @@ let g:cscope_reset_detect_mode = 0
 let g:vim_has_timers = 0
 let g:in_cmdline_mode_t = 0
 let g:in_cmdline_mode_t_load = 0
+let g:enable_soft_link_file = 'ignore'
 "end internal use"
 
 "For debug print"
@@ -170,8 +171,22 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
         endif
     endif
 
+    if "normal" == g:arch_str
+	echo " "
+	echo "Support soft link file or not? (while add -L to find commmand)"
+	let b:support_soft_link = input("Yes: please input 'yes' to support soft link file, default 'NO'>>> ")
+	echo " "
+	if "yes" == b:support_soft_link || "YES" == b:support_soft_link
+	    echo "Customization support soft link file"
+	    let g:enable_soft_link_file = "yes"
+        else
+	    echo "Customization disable soft link file"
+	    let g:enable_soft_link_file = "no"
+	endif
+    endif
+
     let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . 
-    \ g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message"
+    \ g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message " . g:enable_soft_link_file
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
@@ -722,7 +737,7 @@ def main_loop():
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
-                back_run_cmd = "python %s %s %s %s quiet &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                back_run_cmd = "python %s %s %s %s quiet ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
