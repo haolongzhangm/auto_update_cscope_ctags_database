@@ -1,3 +1,8 @@
+" File: plugins/script/github/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags.vim
+" Author: SeaflyDennis <seafly0616@qq.com>
+" Date: 2017.08.05
+" Last Modified Date: 2017.08.05
+" Last Modified By: abc <123>
 "author : haolong.zhang@ck-telecom.com"
 "v0.5: 20170426 init func"
 "v1.0: 20170503 finish for multithreading for gen cscope and ctag database"
@@ -94,14 +99,9 @@ if g:in_cmdline_mode_t_load == 0
   autocmd CmdwinLeave * let g:in_cmdline_mode_t = 0
 endif
 
-command! -nargs=0 -bar Manualstartstopautoupdatedatabas
-    \  call <SID>Manual_start_stop_auto_update_database(0)
-
-command! -nargs=0 -bar Manualupdatedatabaseonetime
-    \  call <SID>Auto_update_cscope_ctags(3)
-
-command! -nargs=0 -bar Createtag
-    \  call <SID>Manual_start_stop_auto_update_database(1)
+command! -nargs=0 -bar Manualstartstopautoupdatedatabas call <SID>Manual_start_stop_auto_update_database(0)
+command! -nargs=0 -bar Manualupdatedatabaseonetime call <SID>Auto_update_cscope_ctags(3)
+command! -nargs=0 -bar Createtag call <SID>Manual_start_stop_auto_update_database(1)
 
 if g:auto_run_function_when_cscope_connect == 1
 	if g:Auto_update_cscope_ctags_running_status == 0
@@ -186,8 +186,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
 	endif
     endif
 
-    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . 
-    \ g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message " . g:enable_soft_link_file
+    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message " . g:enable_soft_link_file
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
@@ -203,12 +202,22 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
         echo "stop to create tags"
         return 0
     endif
+
     exe '!' . g:run_c
     execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
     exe "cs kill -1"
     exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
     let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
+    let g:myLookupFileTagExpr = './filenametags'
+    let g:LookupFile_TagExpr = 'g:myLookupFileTagExpr'
+    let g:LookupFile_MinPatLength = 1               "at least 1 character power find
+    let g:LookupFile_PreserveLastPattern = 0        "don't save last pattern
+    let g:LookupFile_PreservePatternHistory = 1     "save find history
+    let g:LookupFile_AlwaysAcceptFirst = 1          "<Enter> open first match item
+    let g:LookupFile_AllowNewFiles = 0              "Don't allow create no-exist file
+    let g:LookupFile_RecentFileListSize = 30
+    let g:LookupFile_FileFilter = '\.class$\|\.o$\|\.obj$\|\.exe$\|\.jar$\|\.zip$\|\.war$\|\.ear$'
 
     return 0
 endif
