@@ -1,3 +1,8 @@
+" File: plugins/script/github/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags.vim
+" Author: SeaflyDennis <seafly0616@qq.com>
+" Date: 2017.08.06
+" Last Modified Date: 2017.08.06
+" Last Modified By: SeaflyDennis <seafly0616@qq.com>
 "author : haolong.zhang@ck-telecom.com"
 "v0.5: 20170426 init func"
 "v1.0: 20170503 finish for multithreading for gen cscope and ctag database"
@@ -209,6 +214,15 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
     exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
     let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
+    let g:myLookupFileTagExpr = './filenametags'
+    let g:LookupFile_TagExpr = 'g:myLookupFileTagExpr'
+    let g:LookupFile_MinPatLength = 1               "at least 1 character power find
+    let g:LookupFile_PreserveLastPattern = 0        "don't save last pattern
+    let g:LookupFile_PreservePatternHistory = 1     "save find history
+    let g:LookupFile_AlwaysAcceptFirst = 1          "<Enter> open first match item
+    let g:LookupFile_AllowNewFiles = 0              "Don't allow create no-exist file
+    let g:LookupFile_RecentFileListSize = 30
+    let g:LookupFile_FileFilter = '\.class$\|\.o$\|\.obj$\|\.exe$\|\.jar$\|\.zip$\|\.war$\|\.ear$'
 
     return 0
 endif

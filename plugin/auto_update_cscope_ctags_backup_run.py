@@ -1,4 +1,10 @@
-#by haolong.zhang@ck-telecom.com 20170426
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# File: plugins/script/github/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags_backup_run.py
+# Author: SeaflyDennis <seafly0616@qq.com>
+# Date: 2017.08.06
+# Last Modified Date: 2017.08.06
+# Last Modified By: SeaflyDennis <seafly0616@qq.com>
 import os
 import glob
 import sys
@@ -12,9 +18,9 @@ arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
         'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
         'm32r', 'metag', 'mips', 'openrisc', 'powerpc', 'score', \
         'sparc', 'um', 'x86']
-care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh', 
-        '*.mk', '*.prop', '*.xml', 'Makefile', '*.rc', 'platform', 
-        'Drivers', '*.scons', '*.api', '*.tla', '*.smh', '*.smi', 
+care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
+        '*.mk', '*.prop', '*.xml', 'Makefile', '*.rc', 'platform',
+        'Drivers', '*.scons', '*.api', '*.tla', '*.smh', '*.smi',
         '*.smt', '*.idl', '*.te', '*.py', '*.S', '*.tpl', '*.css',
         '*.js', '*.txt', '*.proto', '*.md', '*.conf', '*.json',
         '*.BUILD', '*.bzl', 'BUILD', '*.hpp', '*.launch']
@@ -152,7 +158,7 @@ def Warnin_print(str):
 
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
-    #or not kernel code 
+    #or not kernel code
     gen_tag_dir = './'
     support_soft_link = 'no'
     if len(sys.argv) == 4 or len(sys.argv) == 5 or len(sys.argv) == 6:
@@ -385,6 +391,15 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         else:
             ctags_cmd = ctags_cmd + " -f tags"
             Warnin_print(ctags_cmd)
+
+
+        ctags_cmd = ctags_cmd + ' ; echo "!_TAG_FILE_SORTED\t2\t/2=foldcase">./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -regex ".*\.\(cpp\|h\|c\sh\|txt\|lds\|s\|S\|cfg\|conf\|md\)" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Makefile*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Kconfig*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Kbuild*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "README*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "*readme*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
         os.system(ctags_cmd)
