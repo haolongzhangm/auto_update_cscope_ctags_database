@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File: auto_update_cscope_ctags_backup_run.py
+# File: plugins/script/github/auto_update_cscope_ctags_database/plugin/auto_update_cscope_ctags_backup_run.py
 # Author: SeaflyDennis <seafly0616@qq.com>
-# Date: 2017.08.05
-# Last Modified Date: 2017.08.05
+# Date: 2017.08.06
+# Last Modified Date: 2017.08.06
 # Last Modified By: SeaflyDennis <seafly0616@qq.com>
-#by haolong.zhang@ck-telecom.com 20170426
 import os
 import glob
 import sys
@@ -271,15 +270,13 @@ def cscope_task_func(show_message_enable, s_time):
         normal_cmd = "find"
         if os.path.exists('./.auto_cscope_ctags/.enable_soft_link_file'):
             normal_cmd = normal_cmd + " -L "
+
         normal_cmd = normal_cmd + " . -name '*.c' "
         for i_care_type in care_file_type:
             normal_cmd = normal_cmd + " -o -name " + '\'' + i_care_type + '\''
 
         normal_cmd = normal_cmd + " -o -type f -name '*config'"
-        normal_cmd = normal_cmd + "> cscope.files ; "
-        normal_cmd = normal_cmd + 'echo -e "!_TAG_FILE_SORTED\t2\t/2=foldcase">./filenametags ; '
-        normal_cmd = normal_cmd + 'find ./ -name "*.c" -o -name "*.h" -o -name "Makefile" -o -name "*.lds" -o -name "*config*" -o -name "*build*" -o -name "*.sh" -o -name "*conf*" -o -name "*.s" -o -name "*.S" -o -name *.asm '
-        normal_cmd = normal_cmd + ' -printf "%f\t%p\t1\n" | sort -f >>./filenametags ; '
+        normal_cmd = normal_cmd + "> cscope.files "
         if global_add_pythonlib:
             if check_include_filetyle_or_not('*.py'):
                 debug_backrun_python_print('find python file, try to add pythonlib file...')
@@ -376,15 +373,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print(handle_tags_files_cmd)
         os.system(handle_tags_files_cmd)
 
-        ctags_cmd = 'echo "!_TAG_FILE_SORTED\t2\t/2=foldcase">./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -regex ".*\.\(cpp\|h\|c\sh\|txt\|lds\|s\|S\|cfg\|conf\|md\)" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -name "Makefile*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -name "Kconfig*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -name "Kbuild*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -name "README*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-        ctags_cmd = ctags_cmd + ' ; find . -name "*readme*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
-
-        ctags_cmd = ctags_cmd + " ; tags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+        ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
         #kernel mode
         if 'normal' != sys.argv[1]:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
@@ -402,6 +391,15 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         else:
             ctags_cmd = ctags_cmd + " -f tags"
             Warnin_print(ctags_cmd)
+
+
+        ctags_cmd = ctags_cmd + ' ; echo "!_TAG_FILE_SORTED\t2\t/2=foldcase">./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -regex ".*\.\(cpp\|h\|c\sh\|txt\|lds\|s\|S\|cfg\|conf\|md\)" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Makefile*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Kconfig*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "Kbuild*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "README*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+        ctags_cmd = ctags_cmd + ' ; find . -name "*readme*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
         os.system(ctags_cmd)

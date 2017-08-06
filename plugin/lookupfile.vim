@@ -1,22 +1,8 @@
-" File: lookupfile.vim
-" Author: abc <123>
-" Date: 2017.08.05
-" Last Modified Date: 2017.08.05
-" Last Modified By: abc <123>
-" lookupfile.vim: Lookup filenames by pattern
-" Author: Hari Krishna Dara (hari.vim at gmail dot com)
-" Last Change: 14-Jun-2007 @ 18:30
-" Created:     11-May-2006
-" Requires:    Vim-7.1, genutils.vim(2.3)
-" Version:     1.8.0
-" Licence: This program is free software; you can redistribute it and/or
-"          modify it under the terms of the GNU General Public License.
-"          See http://www.gnu.org/copyleft/gpl.txt 
-" Download From:
-"     http://www.vim.org//script.php?script_id=1581
-" Usage:
-"     See :help lookupfile.txt
-
+" File: plugins/script/github/auto_update_cscope_ctags_database/plugin/lookupfile.vim
+" Author: SeaflyDennis <seafly0616@qq.com>
+" Date: 2017.08.06
+" Last Modified Date: 2017.08.06
+" Last Modified By: SeaflyDennis <seafly0616@qq.com>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "LookupFile:  => Spell checking
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
