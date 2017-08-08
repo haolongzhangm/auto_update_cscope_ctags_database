@@ -10,6 +10,7 @@
 "v2.0.5: 20170721 find issue fix, python file leave database logic
 "v2.0.6: 20170724 type file issue fix, care_file_type * include
 "v3.0:   20170727 support user config soft link file
+"v3.0.1: 20170808 format opt args
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
@@ -117,7 +118,7 @@ endif
 
 function! <SID>Manual_start_stop_auto_update_database(mode)
 if 1 == a:mode
-let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
+let vim_arch_parameter_d = {'not_kernel':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
         \ 'c6x':'1', 'frv':'1', 'hexagon':'1', 'm68k':'1', 'microblaze':'1', 'mn10300':'1',
         \ 'parisc':'1', 's390':'1', 'sh':'1', 'tile':'1', 'unicore32':'1', 'xtensa':'1',
         \ 'arc':'1', 'arm64':'1', 'blackfin':'1', 'cris':'1' ,'h8300':'1', 'ia64':'1',
@@ -137,7 +138,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
 
     if 1 == g:Createtag_need_input_arch
         echo "For example, if you just care ARM64 platform code, just need input arm64"
-        echo "if input 'normal', means: do not build a especially arch, but we do not suggest at a kernel tree"
+        echo "if input 'not_kernel', means: do not build a especially arch, but we do not suggest at a kernel tree"
         let g:arch_str = input("please input a ARCH: ")
         while ! has_key(vim_arch_parameter_d, g:arch_str)
             echo " "
@@ -148,16 +149,16 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
             let g:arch_str = input("please input a ARCH: ")
         endwhile
     else
-        let g:arch_str = "normal"
+        let g:arch_str = "not_kernel"
     endif
 
     echo " "
     if cscope_connection() > 0
         let g:to_user_suggest_tag_dir_str_vim = g:csdbpath
-    elseif "normal" == g:arch_str
+    elseif "not_kernel" == g:arch_str
         let b:tmp_dir_i = 'null'
         echo " "
-        echo "Customization for tag dir for 'normal' project"
+        echo "Customization for tag dir for 'not_kernel' project"
         echo "please input a dir you want ,suggest dir = " . g:to_user_suggest_tag_dir_str_vim
         echo "Press 'Enter' to use suggest dir [" . g:to_user_suggest_tag_dir_str_vim . "]" 
         \ . " or input dir which you tend to"
@@ -172,7 +173,7 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
         endif
     endif
 
-    if "normal" == g:arch_str
+    if "not_kernel" == g:arch_str
 	echo " "
 	echo "Support soft link file or not? (while add -L to find commmand)"
 	let b:support_soft_link = input("Yes: please input 'yes' to support soft link file, default 'NO'>>> ")
@@ -186,8 +187,9 @@ let vim_arch_parameter_d = {'normal':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
 	endif
     endif
 
-    let g:run_c = "python " . " " .g:create_tag_run_py_ret_vim . " " . 
-    \ g:arch_str . " cscope_and_ctags " . g:to_user_suggest_tag_dir_str_vim . " print_message " . g:enable_soft_link_file
+    let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
+      \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
+      \. " -s " .g:enable_soft_link_file
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
@@ -298,7 +300,7 @@ import time
 import getpass
 
 global_log_file = '/tmp/.Auto_update_cscope_ctags_debug_log.log'
-arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
+arch_parameter_list = ['not_kernel', 'alpha', 'arm', 'avr32', \
         'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
         'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
         'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
@@ -499,7 +501,7 @@ def check_cscope_files_type(directory):
             ret = list_arch[1]
         else:
             debug_python_print('this is a generic project')
-            ret = 'normal'
+            ret = 'not_kernel'
 
     else:
         Warn_print("Err: can not find file %s" % check_file)
@@ -604,7 +606,7 @@ def reflash_too_quick(directory):
 
     return ret
 
-def main_loop():
+def vim_trap_into_python_interface():
 
     may_tags_dir = vim.eval("g:for_auto_update_cscope_ctag")
     Create_Mode_I = int(vim.eval("g:Create_Mode"))
@@ -672,7 +674,7 @@ def main_loop():
             Warn_print(" ")
             vim.command("let g:Createtag_need_input_arch = 1")
         else:
-            Warn_print("A normal project will create")
+            Warn_print("A not_kernel project will create")
             vim.command("let g:Createtag_need_input_arch = 0")
             #vim python do not support input, so we will retrun to vim env after print
             #input_str = 'null'
@@ -738,7 +740,7 @@ def main_loop():
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
-                back_run_cmd = "python %s %s %s %s quiet ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
@@ -757,7 +759,7 @@ def main_loop():
             debug_python_print("can not find cscope.flies, for later function")
             return 0
 
-main_loop()
+vim_trap_into_python_interface()
 EOF
 else
     echo "auto update cscope ctags err: Pls build vim with python"

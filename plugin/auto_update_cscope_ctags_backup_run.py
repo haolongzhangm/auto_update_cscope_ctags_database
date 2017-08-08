@@ -5,8 +5,9 @@ import sys
 import time
 import getpass
 import threading
+import getopt
 
-arch_parameter_list = ['normal', 'alpha', 'arm', 'avr32', \
+arch_parameter_list = ['not_kernel', 'alpha', 'arm', 'avr32', \
         'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
         'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
         'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
@@ -32,32 +33,80 @@ global_debug_enable = -1
 global_add_pythonlib = True
 global_pythonlib_dir_str = ['/usr/lib/', '/usr/local/lib/']
 
-second_parameter_list = ['cscope_only', 'cscope_and_ctags']
-fifth_parameter_list = ['print_message', 'quiet']
+database_type_list = ['cscope_only', 'cscope_and_ctags']
+support_soft_link_list = ['yes', 'no', 'ignore']
+
+arch_type_str = 'not_kernel'
+database_type_str = 'cscope_and_ctags'
+pwd_dir_str = './'
+show_msg_bool = False
+support_soft_link_str = 'ignore'
+
+def parse_args():
+    global arch_type_str
+    global database_type_str
+    global pwd_dir_str
+    global show_msg_bool
+    global support_soft_link_str
+
+    if 1 >= len(sys.argv):
+        Warnin_print("Err: too few args")
+        Usage()
+
+    try:
+        optlist, args = getopt.getopt(sys.argv[1:], "hms:a:p:d:")
+    except getopt.GetoptError:
+        Warnin_print('args err')
+        Usage()
+
+    for c, value in optlist:
+        if '-h' == c:
+            Usage()
+        elif '-m' == c:
+            show_msg_bool = True
+        elif '-s' == c:
+            support_soft_link_str = value
+        elif '-a' == c:
+            arch_type_str = value
+        elif '-p' == c:
+            pwd_dir_str = value
+        elif '-d' == c:
+            database_type_str = value
+
+    if show_msg_bool:
+        Warnin_print('args:')
+        Warnin_print(  optlist)
+
+
 def Usage():
-    Warnin_print('v1.0')
-    Warnin_print('python auto_update_cscope_ctags_backup_run.py [ARCH] [tags_type] [pwd/default .] [quiet_or_not] [soft_link_conf]')
+    Warnin_print('v3.0')
+    Warnin_print('python %s [hms:a:p:d:]' % sys.argv[0])
+    Warnin_print(' -h: show help info')
+    Warnin_print(' -m: show msg')
+    Warnin_print(' -s: support_soft_link or not')
+    Warnin_print(' -a: arch type')
+    Warnin_print(' -p: project pwd_dir')
+    Warnin_print(' -d: databse type')
     exit()
 
 def check_args():
-    if len(sys.argv) != 4 and len(sys.argv) != 5 and len(sys.argv) != 6:
-        Warnin_print('need 3 or 4argv or 5argv')
-        Usage()
-
-    if sys.argv[1] not in arch_parameter_list:
-        Warnin_print('arch_parameter only support:')
+    if arch_type_str not in arch_parameter_list:
+        Warnin_print('Do not support ARCH: %s' % arch_type_str)
+        Warnin_print('only support arch:')
         Warnin_print(arch_parameter_list)
         Usage()
 
-    if sys.argv[2] not in second_parameter_list:
-        Warnin_print('second_parameter_list onlys support:')
-        Warnin_print(second_parameter_list)
+    if database_type_str not in database_type_list:
+        Warnin_print('Do not support database_type: %s' % database_type_str)
+        Warnin_print('only support database type')
+        Warnin_print(database_type_list)
         Usage()
-    if len(sys.argv) == 6:
-        if sys.argv[4] not in fifth_parameter_list:
-            Warnin_print('fifth_parameter_first_parm_list: only support:')
-            Warnin_print(fifth_parameter_list)
-            Usage()
+
+    if support_soft_link_str not in support_soft_link_list:
+        Warnin_print('Do not support soft link config: %s' % support_soft_link_str)
+        Warnin_print('only support soft link config')
+        Warnin_print(support_soft_link_list)
+        Usage()
 
 def find_python_install_lib():
     valid_python_lib_dir = False
@@ -153,13 +202,8 @@ def Warnin_print(str):
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
     #or not kernel code 
-    gen_tag_dir = './'
-    support_soft_link = 'no'
-    if len(sys.argv) == 4 or len(sys.argv) == 5 or len(sys.argv) == 6:
-        gen_tag_dir = sys.argv[3]
-
-    if not os.path.exists(gen_tag_dir):
-        Warnin_print("Err :invalid gen_tag_dir : %s" % gen_tag_dir)
+    if not os.path.exists(pwd_dir_str):
+        Warnin_print("Err :invalid pwd_dir_str: %s" % pwd_dir_str)
         return 0
 
     #check needed env
@@ -168,9 +212,9 @@ def gen_cscope_and_ctag_file():
             Warnin_print("ERR: can not find %s pls install it fistly" % env_i)
             return 0
 
-    debug_backrun_python_print(sys.argv[1])
-    gnome_osd_print('%s project update tags start' % sys.argv[1])
-    os.chdir(gen_tag_dir)
+    debug_backrun_python_print(arch_type_str)
+    gnome_osd_print('%s project update tags start' % arch_type_str)
+    os.chdir(pwd_dir_str)
     pre_create_lock_cmd = "mkdir .auto_cscope_ctags 1>/dev/null 2>&1; \
             touch .auto_cscope_ctags/lock 1>/dev/null 2>&1; sync ;\
             rm .auto_cscope_ctags/cscope_detect_wait 1>/dev/null 2>&1"
@@ -206,35 +250,23 @@ def gen_cscope_and_ctag_file():
         Warnin_print("create lock failed, may caused by I/O permmison!")
 
     start_time = time.time()
-    print_cscope_and_ctags_info = 0
-    if len(sys.argv) == 6:
-        support_soft_link = sys.argv[5]
-        if 'quiet' == sys.argv[4]:
-            debug_backrun_python_print("no message print")
-            print_cscope_and_ctags_info = 0
-        elif 'print_message' == sys.argv[4]:
-            debug_backrun_python_print("show print_message")
-            print_cscope_and_ctags_info = 1
-    else:
-        debug_backrun_python_print("show print_message")
-        print_cscope_and_ctags_info = 1
 
-    if 'yes' == support_soft_link:
+    if 'yes' == support_soft_link_str:
         mark_soft_link_exe = "touch .auto_cscope_ctags/.enable_soft_link_file 1>/dev/null 2>&1"
-    elif 'no' == support_soft_link:
+    elif 'no' == support_soft_link_str:
         mark_soft_link_exe = "rm .auto_cscope_ctags/.enable_soft_link_file 1>/dev/null 2>&1"
 
-    if 'yes' == support_soft_link or 'no' == support_soft_link:
+    if 'yes' == support_soft_link_str or 'no' == support_soft_link_str:
         debug_backrun_python_print(mark_soft_link_exe)
         os.system(mark_soft_link_exe)
 
     # add thread
-    cscope_task = threading.Thread(target = cscope_task_func, args = (print_cscope_and_ctags_info, start_time))
-    ctags_task = threading.Thread(target = ctags_task_func, args = (print_cscope_and_ctags_info, start_time, cscope_task))
+    cscope_task = threading.Thread(target = cscope_task_func, args = (show_msg_bool, start_time))
+    ctags_task = threading.Thread(target = ctags_task_func, args = (show_msg_bool, start_time, cscope_task))
 
     cscope_task.start()
     ctags_task.start()
-    if 1 == print_cscope_and_ctags_info:
+    if 1 == show_msg_bool:
         Warnin_print("")
         Warnin_print("cscope_task = %s" % cscope_task)
         Warnin_print("ctags_task = %s" % ctags_task)
@@ -245,12 +277,12 @@ def gen_cscope_and_ctag_file():
 
     clear_lock_i()
     all_take_time  = time.time() - start_time
-    if 1 == print_cscope_and_ctags_info:
+    if 1 == show_msg_bool:
         Warnin_print("All finish take %s s" % all_take_time)
     else:
         debug_backrun_python_print("All finish take %s s" % all_take_time)
 
-    gnome_osd_print('%s project update tags end' % sys.argv[1])
+    gnome_osd_print('%s project update tags end' % arch_type_str)
 
 def clear_lock_i():
     end_remove_lock_cmd = "rm .auto_cscope_ctags/lock 1>/dev/null  2>&1"
@@ -260,17 +292,17 @@ def clear_lock_i():
 
 def cscope_task_func(show_message_enable, s_time):
 
-    if 'normal' == sys.argv[1]:
-        normal_cmd = "find"
+    if 'not_kernel' == arch_type_str:
+        not_kernel_cmd = "find"
         if os.path.exists('./.auto_cscope_ctags/.enable_soft_link_file'):
-            normal_cmd = normal_cmd + " -L "
+            not_kernel_cmd = not_kernel_cmd + " -L "
 
-        normal_cmd = normal_cmd + " . -name '*.c' "
+        not_kernel_cmd = not_kernel_cmd + " . -name '*.c' "
         for i_care_type in care_file_type:
-            normal_cmd = normal_cmd + " -o -name " + '\'' + i_care_type + '\''
+            not_kernel_cmd = not_kernel_cmd + " -o -name " + '\'' + i_care_type + '\''
 
-        normal_cmd = normal_cmd + " -o -type f -name '*config'"
-        normal_cmd = normal_cmd + "> cscope.files "
+        not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config'"
+        not_kernel_cmd = not_kernel_cmd + "> cscope.files "
         if global_add_pythonlib:
             if check_include_filetyle_or_not('*.py'):
                 debug_backrun_python_print('find python file, try to add pythonlib file...')
@@ -279,19 +311,19 @@ def cscope_task_func(show_message_enable, s_time):
                     for dir_i in pythonlib_install_i_dir:
                         if os.path.exists(dir_i):
                             debug_backrun_python_print('now handle pythonlib %s' % dir_i)
-                            normal_cmd = normal_cmd + "; find %s -name '*.py' >> cscope.files" % dir_i
+                            not_kernel_cmd = not_kernel_cmd + "; find %s -name '*.py' >> cscope.files" % dir_i
 
-        normal_cmd = normal_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
+        not_kernel_cmd = not_kernel_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
         if 0 == show_message_enable:
-            normal_cmd = normal_cmd + " 1>/dev/null  2>&1"
+            not_kernel_cmd = not_kernel_cmd + " 1>/dev/null  2>&1"
         else:
-            Warnin_print(normal_cmd)
+            Warnin_print(not_kernel_cmd)
 
-        debug_backrun_python_print(normal_cmd)
+        debug_backrun_python_print(not_kernel_cmd)
         debug_backrun_python_print("now for cscope")
-        os.system(normal_cmd)
-        normal_end_time  = time.time()
-        use_time_str = "cscope Use time = %s s" % (normal_end_time - s_time)
+        os.system(not_kernel_cmd)
+        not_kernel_end_time  = time.time()
+        use_time_str = "cscope Use time = %s s" % (not_kernel_end_time - s_time)
         if 1 == show_message_enable:
             Warnin_print(use_time_str)
         else:
@@ -299,7 +331,7 @@ def cscope_task_func(show_message_enable, s_time):
 
         debug_backrun_python_print("end for cscope")
     else:
-        kernel_cmd = "make cscope ARCH=%s" % sys.argv[1]
+        kernel_cmd = "make cscope ARCH=%s" % arch_type_str
         if 0 == show_message_enable:
             kernel_cmd = kernel_cmd + " 1>/dev/null  2>&1"
         else:
@@ -308,8 +340,8 @@ def cscope_task_func(show_message_enable, s_time):
         debug_backrun_python_print(kernel_cmd)
         debug_backrun_python_print("now for cscope")
         os.system(kernel_cmd)
-        normal_end_time  = time.time()
-        use_time_str = "cscope Use time = %s s" % (normal_end_time - s_time)
+        not_kernel_end_time  = time.time()
+        use_time_str = "cscope Use time = %s s" % (not_kernel_end_time - s_time)
         if 1 == show_message_enable:
             Warnin_print(use_time_str)
         else:
@@ -354,12 +386,12 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             clear_lock_i()
             return -1
 
-    if 'cscope_and_ctags' == sys.argv[2]:
+    if 'cscope_and_ctags' == database_type_str:
         debug_backrun_python_print("now for ctag")
         debug_backrun_python_print("firtly handle cscope.files")
         handle_tags_files_cmd = "cp cscope.files tags.files; "
         diff_size = 0
-        if not 'normal' == sys.argv[1]:
+        if not 'not_kernel' == arch_type_str:
             handle_tags_files_cmd = handle_tags_files_cmd + "sed -i '1,2d' tags.files"
             #-k -q line size = 8
             diff_size = 8
@@ -369,7 +401,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
 
         ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
         #kernel mode
-        if 'normal' != sys.argv[1]:
+        if 'not_kernel' != arch_type_str:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
             ctags_cmd = ctags_cmd + " -I fs_initcall+,subsys_initcall+,device_initcall+,core_initcall+,arch_initcall"
             ctags_cmd = ctags_cmd + " -I late_initcall+,postcore_initcall+,console_initcall+,early_initcall"
@@ -408,5 +440,6 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print("end for ctag")
 
 #############################################start here
+parse_args()
 check_args()
 gen_cscope_and_ctag_file()
