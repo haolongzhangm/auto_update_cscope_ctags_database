@@ -1,8 +1,8 @@
-" File: plugins/script/github/auto_update_cscope_ctags_database/plugin/autoload_cscope_ctags.vim
-" Author: SeaflyDennis <seafly0616@qq.com>
-" Date: 2017.08.06
-" Last Modified Date: 2017.08.06
-" Last Modified By: SeaflyDennis <seafly0616@qq.com>
+" Vim global plugin for autoloading cscope databases.
+" Last Change: Wed Jan 26 10:28:52 Jerusalem Standard Time 2011
+" Maintainer: Michael Conrad Tadpol Tilsra <tadpol@tadpol.org>
+" Revision: 0.5
+
 " 20170426 haolong.zhang@ck-telecom.com export for_auto_update_cscope_ctag
 " add this for auto update cscope and ctags tag
 let g:for_auto_update_cscope_ctag = "null"
