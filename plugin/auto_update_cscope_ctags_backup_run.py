@@ -277,6 +277,7 @@ def cscope_task_func(show_message_enable, s_time):
 
         normal_cmd = normal_cmd + " -o -type f -name '*config'"
         normal_cmd = normal_cmd + "> cscope.files "
+
         if global_add_pythonlib:
             if check_include_filetyle_or_not('*.py'):
                 debug_backrun_python_print('find python file, try to add pythonlib file...')
@@ -287,7 +288,8 @@ def cscope_task_func(show_message_enable, s_time):
                             debug_backrun_python_print('now handle pythonlib %s' % dir_i)
                             normal_cmd = normal_cmd + "; find %s -name '*.py' >> cscope.files" % dir_i
 
-        normal_cmd = normal_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
+        normal_cmd = normal_cmd + ";cscope -bq -i cscope.files -f cscope.out"
+        #normal_cmd = normal_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
         if 0 == show_message_enable:
             normal_cmd = normal_cmd + " 1>/dev/null  2>&1"
         else:
@@ -373,7 +375,8 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print(handle_tags_files_cmd)
         os.system(handle_tags_files_cmd)
 
-        ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+        #ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+        ctags_cmd = "ctags -R --file-scope=yes --langmap=c:+.h --languages=Asm,Awk,C,C++,C#,HTML,Java,JavaScript,Make,PHP,Sh,python --links=yes --c-kinds=+p --c++-kinds=+p --fields=+lafikmnsztS --extra=+fq -L tags.files"
         #kernel mode
         if 'normal' != sys.argv[1]:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
@@ -392,7 +395,6 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             ctags_cmd = ctags_cmd + " -f tags"
             Warnin_print(ctags_cmd)
 
-
         ctags_cmd = ctags_cmd + ' ; echo "!_TAG_FILE_SORTED\t2\t/2=foldcase">./filenametags'
         ctags_cmd = ctags_cmd + ' ; find . -regex ".*\.\(cpp\|h\|c\sh\|txt\|lds\|s\|S\|cfg\|conf\|md\)" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
         ctags_cmd = ctags_cmd + ' ; find . -name "Makefile*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
@@ -400,6 +402,24 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         ctags_cmd = ctags_cmd + ' ; find . -name "Kbuild*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
         ctags_cmd = ctags_cmd + ' ; find . -name "README*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
         ctags_cmd = ctags_cmd + ' ; find . -name "*readme*" -printf "%f\t%p\t1\n" | sort -f >> ./filenametags'
+
+        ctags_cmd = ctags_cmd + " ; ctags -R -f ${HOME}/systags --c-kinds=+p --fields=+S /usr/include /usr/local/include"
+        ctags_cmd = ctags_cmd + " ; sed -i '1,6d' ${HOME}/systags"
+        #ctags_cmd = ctags_cmd + " -I __THROW"
+        #ctags_cmd = ctags_cmd + " -I __attribute_pure__"
+        #ctags_cmd = ctags_cmd + " -I __nonnull"
+        #ctags_cmd = ctags_cmd + " -I __attribute__"
+        #ctags_cmd = ctags_cmd + " -R /usr/include/"
+        #ctags_cmd = ctags_cmd + " | sort -u -o ./tags.stdfunc tags"
+
+        #ctags_cmd = ctags_cmd + " ; myfile=tags.stdfunc"
+        #ctags_cmd = ctags_cmd + " ; total_lines=`sed -n '$=' ${myfile}`"
+        #ctags_cmd = ctags_cmd + " ; last_lines=6"
+        #ctags_cmd = ctags_cmd + " ; express=${total_lines}-${last_lines}+1"
+        #ctags_cmd = ctags_cmd + " ; sLine=`echo ${express} | bc`"
+        #ctags_cmd = ctags_cmd + " ; sed -i ${sLine}',$d' ${myfile}"
+
+        ctags_cmd = ctags_cmd + " ; cat ${HOME}/systags >> tags"
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
         os.system(ctags_cmd)
