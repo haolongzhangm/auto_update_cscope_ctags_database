@@ -6,6 +6,7 @@
 " 20170426 haolong.zhang@ck-telecom.com export for_auto_update_cscope_ctag
 " add this for auto update cscope and ctags tag
 let g:for_auto_update_cscope_ctag = "null"
+let g:python_file = 0
 
 if exists("loaded_autoload_cscope")
 	finish
@@ -149,6 +150,7 @@ function s:Unload_csdb()
       let &csverb = save_csvb
     endif
   endif
+  execute 'set tags ='
 endfunc
 "
 "==
@@ -161,29 +163,35 @@ function s:Cycle_csdb()
         "it is already loaded. don't try to reload it.
       endif
     endif
+    "if readbuffer is python file && at the new dir can not find
+    "databse we will try to load old databse, caused by we need
+    "use old database when in python lib file
     let newcsdbpath = s:Find_in_parent("cscope.out",s:windowdir(),$HOME)
-	let g:for_auto_update_cscope_ctag = newcsdbpath
-    "echo "Found cscope.out at: " . newcsdbpath
-    "echo "Windowdir: " . s:windowdir()
-	"we think ctags file should at the same dir
-	"so try to update ctags file when proj chang from A to B
-	if filereadable(newcsdbpath . "/tags")
-		"echo "Found tags at: " . newcsdbpath
-		execute 'set tags ='. newcsdbpath . '/tags'
-	else
-		"echo "No tags"
-		execute 'set tags ='
-	endif
     if newcsdbpath != "Nothing"
-      let g:csdbpath = newcsdbpath
+	    let g:for_auto_update_cscope_ctag = newcsdbpath
+    elseif 0 == g:python_file
+	    let g:for_auto_update_cscope_ctag = "Nothing"
+    endif
+    if g:for_auto_update_cscope_ctag != "Nothing"
+      let g:csdbpath = g:for_auto_update_cscope_ctag
       if !cscope_connection(3, "out", g:csdbpath)
         let save_csvb = &csverb
         set nocsverb
         exe "cs add " . g:csdbpath . "/cscope.out " .g:csdbpath
         set csverb
         let &csverb = save_csvb
+	"echo "Found cscope.out at: " . g:csdbpath
+	"echo "Windowdir: " . s:windowdir()
+	"we think ctags file should at the same dir
+	"so try to update ctags file when proj chang from A to B
+	if filereadable(g:csdbpath . "/tags")
+		"echo "Found tags at: " . g:csdbpath
+		execute 'set tags ='. g:csdbpath . '/tags'
+	else
+		"echo "No tags"
+		execute 'set tags ='
+	endif
       endif
-      "
     else " No cscope database, undo things. (someone rm-ed it or somesuch)
       call s:Unload_csdb()
     endif
@@ -192,6 +200,7 @@ endfunc
 " auto toggle the menu
 augroup autoload_cscope
  au!
+ au BufNewFile,BufEnter *.py let g:python_file=1
  au BufEnter *.[chlysS]  call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.cc      call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.cpp      call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
@@ -230,6 +239,7 @@ augroup autoload_cscope
  au BufEnter *.hpp      call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.launch   call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.[chlysS] call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload * let g:python_file=0
  au BufUnload *.cc     call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.cpp     call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.java     call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
@@ -252,7 +262,7 @@ augroup autoload_cscope
  au BufUnload *.idl    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.sh    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.te    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
- "au BufUnload *.py    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.py    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.mak    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.tpl    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.css    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
