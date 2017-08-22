@@ -29,8 +29,8 @@ global_debug_enable = -1
 #you may config this dir, if you change the
 #python default install dir, eg MAC os may
 #need config this str
-#global_add_pythonlib = False
-global_add_pythonlib = True
+add_pythonlib = 'ignore'
+add_pythonlib_list = ['yes', 'no', 'ignore']
 global_pythonlib_dir_str = ['/usr/lib/', '/usr/local/lib/']
 
 database_type_list = ['cscope_only', 'cscope_and_ctags']
@@ -48,13 +48,14 @@ def parse_args():
     global pwd_dir_str
     global show_msg_bool
     global support_soft_link_str
+    global add_pythonlib
 
     if 1 >= len(sys.argv):
         Warnin_print("Err: too few args")
         Usage()
 
     try:
-        optlist, args = getopt.getopt(sys.argv[1:], "hms:a:p:d:")
+        optlist, args = getopt.getopt(sys.argv[1:], "hms:a:p:d:y:")
     except getopt.GetoptError:
         Warnin_print('args err')
         Usage()
@@ -72,6 +73,8 @@ def parse_args():
             pwd_dir_str = value
         elif '-d' == c:
             database_type_str = value
+        elif '-y' == c:
+            add_pythonlib = value
 
     if show_msg_bool:
         Warnin_print('args:')
@@ -80,13 +83,14 @@ def parse_args():
 
 def Usage():
     Warnin_print('v3.0')
-    Warnin_print('python %s [hms:a:p:d:]' % sys.argv[0])
+    Warnin_print('python %s [hms:a:p:d:y:]' % sys.argv[0])
     Warnin_print(' -h: show help info')
     Warnin_print(' -m: show msg')
     Warnin_print(' -s: support_soft_link or not')
     Warnin_print(' -a: arch type')
     Warnin_print(' -p: project pwd_dir')
     Warnin_print(' -d: databse type')
+    Warnin_print(' -y: support python API or not')
     exit()
 
 def check_args():
@@ -106,6 +110,12 @@ def check_args():
         Warnin_print('Do not support soft link config: %s' % support_soft_link_str)
         Warnin_print('only support soft link config')
         Warnin_print(support_soft_link_list)
+        Usage()
+
+    if add_pythonlib not in add_pythonlib_list:
+        Warnin_print('Do not support add_pythonlib_list type: %s' % add_pythonlib)
+        Warnin_print('only support add_pythonlib type')
+        Warnin_print(add_pythonlib_list)
         Usage()
 
 def find_python_install_lib():
@@ -251,6 +261,7 @@ def gen_cscope_and_ctag_file():
 
     start_time = time.time()
 
+    #config soft link
     if 'yes' == support_soft_link_str:
         mark_soft_link_exe = "touch .auto_cscope_ctags/.enable_soft_link_file 1>/dev/null 2>&1"
     elif 'no' == support_soft_link_str:
@@ -259,6 +270,16 @@ def gen_cscope_and_ctag_file():
     if 'yes' == support_soft_link_str or 'no' == support_soft_link_str:
         debug_backrun_python_print(mark_soft_link_exe)
         os.system(mark_soft_link_exe)
+
+    #config support pythonlib
+    if 'yes' == add_pythonlib:
+        mark_add_pythonlib_exe = "touch .auto_cscope_ctags/.add_pythonlib_file 1>/dev/null 2>&1"
+    elif 'no' == add_pythonlib:
+        mark_add_pythonlib_exe = "rm .auto_cscope_ctags/.add_pythonlib_file 1>/dev/null 2>&1"
+
+    if 'yes' == add_pythonlib or 'no' == add_pythonlib:
+        debug_backrun_python_print(mark_add_pythonlib_exe)
+        os.system(mark_add_pythonlib_exe)
 
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (show_msg_bool, start_time))
@@ -303,7 +324,7 @@ def cscope_task_func(show_message_enable, s_time):
 
         not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config'"
         not_kernel_cmd = not_kernel_cmd + "> cscope.files "
-        if global_add_pythonlib:
+        if os.path.exists('./.auto_cscope_ctags/.add_pythonlib_file'):
             if check_include_filetyle_or_not('*.py'):
                 debug_backrun_python_print('find python file, try to add pythonlib file...')
                 (valid_install_dir, pythonlib_install_i_dir) = find_python_install_lib()

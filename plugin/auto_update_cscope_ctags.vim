@@ -21,6 +21,7 @@ let g:vim_has_timers = 0
 let g:in_cmdline_mode_t = 0
 let g:in_cmdline_mode_t_load = 0
 let g:enable_soft_link_file = 'ignore'
+let g:add_pythonlib = 'ignore'
 "end internal use"
 
 "For debug print"
@@ -185,11 +186,24 @@ let vim_arch_parameter_d = {'not_kernel':'1', 'alpha':'1', 'arm':'1', 'avr32':'1
 	    echo "Customization disable soft link file"
 	    let g:enable_soft_link_file = "no"
 	endif
+
+	echo " "
+	echo "Support python API or not? only take effect when project have python file"
+	echo "(if U care about python lib API, U may input yes)"
+	let b:support_pythonlib = input("Yes: please input 'yes' to support pythonlib API, default 'NO'>>> ")
+	echo " "
+	if "yes" == b:support_pythonlib || "YES" == b:support_pythonlib
+	    echo "Customization support python API"
+	    let g:add_pythonlib = "yes"
+        else
+	    echo "Customization do not support python API"
+	    let g:add_pythonlib= "no"
+	endif
     endif
 
     let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
       \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
-      \. " -s " .g:enable_soft_link_file
+      \. " -s " .g:enable_soft_link_file . " -y " .g:add_pythonlib
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
@@ -740,7 +754,7 @@ def vim_trap_into_python_interface():
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
-                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -y ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
