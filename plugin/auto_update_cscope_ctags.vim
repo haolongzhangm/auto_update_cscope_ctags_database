@@ -660,8 +660,6 @@ def vim_trap_into_python_interface():
         return 0
     #end detect cscope reset mode
 
-    #set a err status firstly
-    vim.command("let g:create_tag_run_py_ret_vim = '0'")
     if 1 == Create_Mode_I:
         default_tag_dir = vim.eval("g:curbufferpwd")
         print("Now try to Create cscope and ctags database")
@@ -700,6 +698,8 @@ def vim_trap_into_python_interface():
             #    input_str = raw_input("Please input a vaild cpu ARCH:")
 
         #before return we need return back_run_python_dir and put to_user_suggest_tag_dir to vim
+        #set a err status firstly
+        vim.command("let g:create_tag_run_py_ret_vim = '0'")
         create_tag_run_py_ret = get_backup_run_py()
         if 'null' != create_tag_run_py_ret and os.path.exists(create_tag_run_py_ret):
             tmp_put_create_tag_run_py_ret_vim = "let g:create_tag_run_py_ret_vim = '%s'" % create_tag_run_py_ret
