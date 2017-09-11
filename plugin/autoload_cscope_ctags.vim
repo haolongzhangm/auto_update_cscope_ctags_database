@@ -239,6 +239,14 @@ augroup autoload_cscope
  au BufEnter *.hpp      call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.launch   call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.asm	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.ec	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.pgc	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.m	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.cxx	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.pcc	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.H	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.hh	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.cu	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.[chlysS] call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload * let g:python_file=0
  au BufUnload *.cc     call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
@@ -279,6 +287,14 @@ augroup autoload_cscope
  au BufUnload *.hpp    call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.launch call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.asm	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.ec	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.pgc	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.m	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.cxx	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.pcc	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.H	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.hh	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.cu	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
 augroup END
 
 let &cpo = s:save_cpo
