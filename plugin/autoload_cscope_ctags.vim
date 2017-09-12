@@ -247,6 +247,7 @@ augroup autoload_cscope
  au BufEnter *.H	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.hh	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufEnter *.cu	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
+ au BufEnter *.prototxt	call <SID>Cycle_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.[chlysS] call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload * let g:python_file=0
  au BufUnload *.cc     call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
@@ -295,6 +296,7 @@ augroup autoload_cscope
  au BufUnload *.H	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.hh	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
  au BufUnload *.cu	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
+ au BufUnload *.prototxt	call <SID>Unload_csdb() | call <SID>Cycle_macros_menus()
 augroup END
 
 let &cpo = s:save_cpo

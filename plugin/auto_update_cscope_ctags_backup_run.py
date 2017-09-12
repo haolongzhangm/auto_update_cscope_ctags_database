@@ -20,7 +20,7 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
         '*.js', '*.txt', '*.proto', '*.md', '*.conf', '*.json',
         '*.BUILD', '*.bzl', 'BUILD', '*.hpp', '*.launch', '*.asm',
         '*.ec', '*.pgc', '*.m', '*.cxx', '*.pcc', '*.H', '*.hh',
-        '*.cu']
+        '*.cu', '*.prototxt']
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
