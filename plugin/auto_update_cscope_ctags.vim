@@ -120,13 +120,6 @@ endif
 
 function! <SID>Manual_start_stop_auto_update_database(mode)
 if 1 == a:mode
-let vim_arch_parameter_d = {'not_kernel':'1', 'alpha':'1', 'arm':'1', 'avr32':'1',
-        \ 'c6x':'1', 'frv':'1', 'hexagon':'1', 'm68k':'1', 'microblaze':'1', 'mn10300':'1',
-        \ 'parisc':'1', 's390':'1', 'sh':'1', 'tile':'1', 'unicore32':'1', 'xtensa':'1',
-        \ 'arc':'1', 'arm64':'1', 'blackfin':'1', 'cris':'1' ,'h8300':'1', 'ia64':'1',
-        \ 'm32r':'1', 'metag':'1', 'mips':'1', 'openrisc':'1', 'powerpc':'1', 'score':'1',
-        \ 'sparc':'1', 'um':'1', 'x86':'1'
-        \ }
     call <SID>Auto_update_cscope_ctags(a:mode)
     if '0' == g:create_tag_run_py_ret_vim
         echo ' '
@@ -142,7 +135,7 @@ let vim_arch_parameter_d = {'not_kernel':'1', 'alpha':'1', 'arm':'1', 'avr32':'1
         echo "For example, if you just care ARM64 platform code, just need input arm64"
         echo "if input 'not_kernel', means: do not build a especially arch, but we do not suggest at a kernel tree"
         let g:arch_str = input("please input a ARCH: ")
-        while ! has_key(vim_arch_parameter_d, g:arch_str)
+        while ! has_key(g:vim_arch_parameter_d, g:arch_str)
             echo " "
             echo " "
             echo ">>>>>>>>Do not support " . "ARCH = ". g:arch_str
@@ -315,12 +308,7 @@ import time
 import getpass
 
 global_log_file = '/tmp/.Auto_update_cscope_ctags_debug_log.log'
-arch_parameter_list = ['not_kernel', 'alpha', 'arm', 'avr32', \
-        'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
-        'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
-        'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
-        'm32r', 'metag', 'mips', 'openrisc', 'powerpc', 'score', \
-        'sparc', 'um', 'x86']
+arch_parameter_list = ['not_kernel']
 
 def debug_python_print(str):
     enable_debug_log = int(vim.eval("g:Auto_update_cscope_ctags_debug_log"))
@@ -596,6 +584,21 @@ def check_kernel_code_characteristic(check_tree):
         force_file = cache_dir + kernel_tree_force_check_file
         if os.path.exists(force_file):
             os.chdir(old_dir)
+            debug_python_print("sure be kernel_tree, not we update ARCH list")
+            arch_dir = cache_dir + "/arch"
+            may_arch = os.listdir(arch_dir)
+            #debug_python_print(may_arch)
+            may_arch_string = "{\'not_kernel\'"+":\'1\'"
+            for i in may_arch:
+                if os.path.isdir(arch_dir + "/" + i):
+                    arch_parameter_list.append(i)
+                    may_arch_string = may_arch_string + ", \'" + i + "\'" + ":\'1\'"
+
+            may_arch_string = may_arch_string + "}"
+            update_arch_list_to_vim = "let g:vim_arch_parameter_d = " + may_arch_string
+            #debug_python_print(update_arch_list_to_vim)
+            vim.command(update_arch_list_to_vim)
+
             return (cache_dir, kernel_tree_or_not)
         else:
             kernel_tree_or_not = 'false'

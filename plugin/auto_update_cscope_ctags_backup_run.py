@@ -7,12 +7,8 @@ import getpass
 import threading
 import getopt
 
-arch_parameter_list = ['not_kernel', 'alpha', 'arm', 'avr32', \
-        'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', \
-        'parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', \
-        'arc', 'arm64', 'blackfin', 'cris' ,'h8300', 'ia64', \
-        'm32r', 'metag', 'mips', 'openrisc', 'powerpc', 'score', \
-        'sparc', 'um', 'x86']
+arch_parameter_list = ['not_kernel']
+
 care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh', 
         '*.mk', '*.prop', '*.xml', 'Makefile', '*.rc', 'platform', 
         'Drivers', '*.scons', '*.api', '*.tla', '*.smh', '*.smi', 
@@ -462,7 +458,22 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             debug_backrun_python_print(ctags_use_time_str)
         debug_backrun_python_print("end for ctag")
 
+def update_arch_param():
+    if 'not_kernel' != arch_type_str:
+        debug_backrun_python_print("may kernel project, now update arch param")
+        arch_dir = pwd_dir_str + "/arch"
+        try:
+            may_arch = os.listdir(arch_dir)
+        except OSError:
+            Warnin_print("wrong pwd args: %s" % pwd_dir_str)
+            return
+
+        for i in may_arch:
+            if os.path.isdir(arch_dir + "/" + i):
+                arch_parameter_list.append(i)
+
 #############################################start here
 parse_args()
+update_arch_param()
 check_args()
 gen_cscope_and_ctag_file()
