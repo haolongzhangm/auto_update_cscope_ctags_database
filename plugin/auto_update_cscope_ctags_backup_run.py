@@ -428,6 +428,8 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             ctags_cmd = ctags_cmd + " -I late_initcall_sync+,arch_initcall_sync+,rootfs_initcall+,pure_initcall+,__exitcall"
             ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
             ctags_cmd = ctags_cmd + " --langmap=c:+.h"
+        else:
+            ctags_cmd = ctags_cmd + " --langmap=c++:+.cu"
         #slient mode
         if 0 == show_message_enable:
             ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
