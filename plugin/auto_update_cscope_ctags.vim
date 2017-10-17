@@ -150,6 +150,7 @@ if 1 == a:mode
     echo " "
     if cscope_connection() > 0
         let g:to_user_suggest_tag_dir_str_vim = g:csdbpath
+        echo "Already find database at: " . g:csdbpath
     elseif "not_kernel" == g:arch_str
         let b:tmp_dir_i = 'null'
         echo " "
@@ -163,8 +164,8 @@ if 1 == a:mode
             echo "use suggest dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]" 
         else
             echo " "
-            echo "use Customization dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]"
             let g:to_user_suggest_tag_dir_str_vim = b:tmp_dir_i
+            echo "use Customization dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]"
         endif
     endif
 
