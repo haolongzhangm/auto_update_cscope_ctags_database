@@ -151,7 +151,8 @@ if 1 == a:mode
     if cscope_connection() > 0
         let g:to_user_suggest_tag_dir_str_vim = g:csdbpath
         echo "Already find database at: " . g:csdbpath
-    elseif "not_kernel" == g:arch_str
+    endif
+    if "not_kernel" == g:arch_str
         let b:tmp_dir_i = 'null'
         echo " "
         echo "Customization for tag dir for 'not_kernel' project"
@@ -166,9 +167,15 @@ if 1 == a:mode
             echo " "
             let g:to_user_suggest_tag_dir_str_vim = b:tmp_dir_i
             echo "use Customization dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]"
-        endif
+	 endif
     endif
-
+    if cscope_connection() > 0
+        if g:to_user_suggest_tag_dir_str_vim != g:csdbpath
+		echo "change tags dir, so need remove old"
+		exe '!' . "rm " . g:csdbpath . "/cscope.* ; echo 'already remove old cscope datase'"
+		exe '!' . "rm " . g:csdbpath . "/tags; echo 'already remove old ctags databse'"
+	endif
+    endif
     if "not_kernel" == g:arch_str
 	echo " "
 	echo "Support soft link file or not? (while add -L to find commmand)"
