@@ -171,9 +171,12 @@ if 1 == a:mode
     endif
     if cscope_connection() > 0
         if g:to_user_suggest_tag_dir_str_vim != g:csdbpath
-		echo "change tags dir, so need remove old"
-		exe '!' . "rm " . g:csdbpath . "/cscope.* ; echo 'already remove old cscope datase'"
-		exe '!' . "rm " . g:csdbpath . "/tags; echo 'already remove old ctags databse'"
+		echo " "
+		echo "+++++change database dir, so need remove old++++++"
+		let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+		let cmd_output = system(b:remove_old_cscope)
+		let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
+		let cmd_output = system(remove_old_tags)
 	endif
     endif
     if "not_kernel" == g:arch_str
