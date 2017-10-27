@@ -195,11 +195,11 @@ def debug_backrun_python_print(str):
             f.close()
 
     if 1 == global_debug_enable:
-        f = open(global_back_run_log_file,'a')
-        print >> f, '\n'
-        print >> f, time.localtime(time.time())
-        print >> f, str
-        f.close()
+        with open(global_back_run_log_file, 'a') as f:
+            f.write('\n')
+            f.write('%s: ' % time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
+            f.write('%s' % str)
+            f.write('\n')
     else:
         return 0
 

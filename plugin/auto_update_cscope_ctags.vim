@@ -326,10 +326,11 @@ def debug_python_print(str):
 
     if 1 == enable_debug_log:
         f = open(global_log_file,'a')
-        print >> f, '\n'
-        print >> f, time.localtime(time.time())
-        print >> f, str
-        f.close()
+        with open(global_log_file, 'a') as f:
+            f.write('\n')
+            f.write('%s: ' % time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time())))
+            f.write('%s' % str)
+            f.write('\n')
     else:
         return 0
 
@@ -530,7 +531,8 @@ def get_backup_run_py():
     may_backup_run_py_file_tmp = vim.eval("g:auto_update_cscope_ctags_backup_run_py_name_cache")
     if 0 <= may_backup_run_py_file_tmp.find('~'):
         debug_python_print('use ~ for user name convert it')
-        may_backup_run_py_file = may_backup_run_py_file_tmp.replace('~', '/home/%s') % user_name
+        may_backup_run_py_file = may_backup_run_py_file_tmp.replace('~', '%s') % \
+                os.path.expanduser('~')
     else:
         may_backup_run_py_file = may_backup_run_py_file_tmp
 
@@ -538,7 +540,7 @@ def get_backup_run_py():
         debug_python_print("cache back run python %s success" % may_backup_run_py_file)
         ret = may_backup_run_py_file
     else:
-        hard_search_dir = '/home/%s/.vim/' % user_name 
+        hard_search_dir = '%s/.vim/' % os.path.expanduser('~')
         for root, sub_dirs, files in os.walk(hard_search_dir):
             for i_file in files:
                 if 'auto_update_cscope_ctags_backup_run.py' == i_file:
