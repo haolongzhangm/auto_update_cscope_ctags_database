@@ -758,9 +758,6 @@ def vim_trap_into_python_interface():
         file_result = scan_f_new(may_tags_dir)
         if file_result > 0:
             handle_arch = check_cscope_files_type(may_tags_dir)
-            if handle_arch not in arch_parameter_list:
-                Warn_print("Err: ARCH: %s do not support or err happned" % handle_arch)
-                return -1
 
             run_py_ret = get_backup_run_py()
             if 'null' != run_py_ret and os.path.exists(run_py_ret):
