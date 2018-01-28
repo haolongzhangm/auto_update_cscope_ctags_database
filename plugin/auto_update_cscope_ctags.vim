@@ -12,6 +12,7 @@
 "v3.0:   20170727 support user config soft link file
 "v3.0.1: 20170808 format opt args
 "v3.0.2: 20170822 optimize python API support config
+"v4.0.0: 20180128 v4.0 release
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0

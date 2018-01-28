@@ -1,4 +1,4 @@
-Brief (V2.0.1)
+Brief (V4.0.0)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base third part)
 -----

@@ -80,7 +80,7 @@ def parse_args():
 
 
 def Usage():
-    Warnin_print('v3.0')
+    Warnin_print('v4.0')
     Warnin_print('python %s [hms:a:p:d:y:]' % sys.argv[0])
     Warnin_print(' -h: show help info')
     Warnin_print(' -m: show msg')
