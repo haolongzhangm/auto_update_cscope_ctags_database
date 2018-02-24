@@ -350,8 +350,8 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 '.java', '.sh', '.mk', '.prop', '.xml', 'Makefile', '.rc', 'platform', \
 'Drivers', '.scons', '.api', '.tla', '.smh', '.smi', '.smt', '.idl', '.te', \
 '.py', '.S', '.tpl', '.css', '.js', '.txt', 'proto', '.md' '.conf', '.json', \
-'BUILD', '.bzl', 'BUILD', '.hpp', '.launch', '.asm', \
-'.ec', '.pgc', '.m', '.cxx', '.pcc', '.H', '.hh', '.cu', '.prototxt', '.opencl']):
+'BUILD', '.bzl', 'BUILD', '.hpp', '.launch', '.asm', '.ec', '.pgc', '.m', \
+'.cxx', '.pcc', '.H', '.hh', '.cu', '.prototxt', '.opencl', '.cl']):
 
     ret = 0
     cmp_file = directory + '/cscope.files'

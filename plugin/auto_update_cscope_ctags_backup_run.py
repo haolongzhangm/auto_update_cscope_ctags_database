@@ -16,7 +16,7 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
         '*.js', '*.txt', '*.proto', '*.md', '*.conf', '*.json',
         '*.BUILD', '*.bzl', 'BUILD', '*.hpp', '*.launch', '*.asm',
         '*.ec', '*.pgc', '*.m', '*.cxx', '*.pcc', '*.H', '*.hh',
-        '*.cu', '*.prototxt', '*.opencl']
+        '*.cu', '*.prototxt', '*.opencl', '*.cl']
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
@@ -429,7 +429,7 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
             ctags_cmd = ctags_cmd + " --langmap=c:+.h"
         else:
-            ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c++:+.opencl"
+            ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c++:+.opencl --langmap=c++:+.cl"
         #slient mode
         if 0 == show_message_enable:
             ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
