@@ -268,8 +268,8 @@ function! <SID>FindBufferReallyPwd()
 	endif
 	echo 'BUF: ' . l:Findcomand_args
 	echo 'CUR: ' . l:Findcommand_args_pwd
-if has('python') || has('python3')
-python << EOF
+if has('pythonx')
+pyx << EOF
 import vim
 find_tmp_str = vim.eval("l:Findcomand_args")
 find_command_str = "let g:curbufferpwd = '%s'" %  (find_tmp_str[:find_tmp_str.rindex("/")])
@@ -308,8 +308,8 @@ function! <SID>Auto_update_cscope_ctags(create_mode)
 		return 0
 	endif
 
-if has('python') || has('python3')
-python << EOF
+if has('pythonx')
+pyx << EOF
 import vim
 import os
 import time
