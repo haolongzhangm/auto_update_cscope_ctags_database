@@ -13,6 +13,7 @@
 "v3.0.1: 20170808 format opt args
 "v3.0.2: 20170822 optimize python API support config
 "v4.0.0: 20180128 v4.0 release
+"v4.0.1: 20180528 v4.0.1 support MAC OS
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
@@ -318,6 +319,7 @@ import string
 import sys
 import time
 import getpass
+import psutil
 
 global_log_file = '/tmp/.Auto_update_cscope_ctags_debug_log.log'
 arch_parameter_list = ['not_kernel']
@@ -400,6 +402,7 @@ def lock_check_pid(i_lock):
 
         debug_python_print("i_lock_buffer len %s" % i_lock_buffer_len)
         if 2 == i_lock_buffer_len:
+            '''
             cmd_may_file = "/proc/%s/cmdline" % i_lock_buffer[0].strip()
             debug_python_print("cmd_may_file = %s" % cmd_may_file)
             if os.path.exists(cmd_may_file):
@@ -419,6 +422,20 @@ def lock_check_pid(i_lock):
             else:
                 ret = -1
                 debug_python_print("pid = %s already exit" % i_lock_buffer[0].strip())
+            '''
+            cmd_may_file = int(i_lock_buffer[0].strip())
+            try:
+              compare_cmd = "%s" % psutil.Process(cmd_may_file).cmdline()
+              if i_lock_buffer[1].strip() == compare_cmd:
+                debug_python_print("lock_check_pid success: really valid lock")
+                ret = 1
+              else:
+                debug_python_print("diff proccess new = %s %d" % (compare_cmd, len(compare_cmd)))
+                debug_python_print("diff proccess old = %s %d" % (i_lock_buffer[1].strip(), len(i_lock_buffer[1].strip())))
+                ret = -1
+            except psutil._exceptions.NoSuchProcess:
+              ret = -1
+              debug_python_print("pid = %s already exit" % i_lock_buffer[0].strip())
         else:
             ret = -1
             debug_python_print("invaild lock")
@@ -439,6 +456,7 @@ def check_lock_status_and_time(lock_str):
     ret = -1
     if os.path.exists(lock_str):
         ret = 1
+        '''
         btime_l= ['0', '0']
         if os.path.exists('/proc/stat'):
             f = open('/proc/stat', 'r')
@@ -450,6 +468,8 @@ def check_lock_status_and_time(lock_str):
             f.close()
 
         btime_l_int = int(btime_f[1])
+        '''
+        btime_l_int = int(psutil.boot_time())
         debug_python_print("btime: %s" % btime_l_int)
         debug_python_print("Find lock %s" % lock_str)
         now_time = time.time()

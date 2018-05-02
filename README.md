@@ -1,6 +1,6 @@
-Brief (V4.0.0)
+Brief (V4.0.1)
 ===
-#auto load cscope database and ctags databse, even diffrect project swicth(base third part)
+#auto load cscope database and ctags databse, even diffrect project swicth(base autoload_cscope_ctags.vim)
 -----
 
 #auto update database if cscope connect
@@ -17,7 +17,7 @@ add below in ~/.vimrc <br>
 let g:auto_run_function_when_cscope_connect = 0 <br>
 then you can run command : <br>
 :Manualstartstopautoupdatedatabas<br>
-to start or stop auto update database<br>
+to start or stop auto update database manually<br>
 
 we also add a command :Manualupdatedatabaseonetime <br>
 which porvide a chance to update database onetime <br>
@@ -25,18 +25,21 @@ espiaclly, user disable g:auto_run_function_when_cscope_connect = 0  <br>
 
 #easy create new cscope and ctags databse by command  :Createtag
 -----
-can intelligent identificate kernel dir eg:<br>
+can intelligent identificate Linux kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
-we can intelligent detect it is a kernel tree, then call make cscope [ARCH] for gen <br>
+we can intelligent detect it is a Linux kernel tree, then call make cscope [ARCH] for gen <br>
 kernel database<br>
 
-suppor ARCH:<br>
+suppor Linux kernel ARCH:<br>
 alpha', 'arm', 'avr32', 'c6x', 'frv', 'hexagon', 'm68k', 'microblaze', 'mn10300', <br>
 parisc', 's390', 'sh', 'tile', 'unicore32', 'xtensa', 'arc', 'arm64', 'blackfin', <br>
 cris', 'h8300', 'ia64', 'm32r', 'metag', 'mips', 'openrisc', 'powerpc', 'score', <br>
 sparc', 'um', 'x86<br>
  
-if we can not  match kernel tree we will use  find command to gen needed files  <br>
+if we can not  match kernel tree we will use 'find' command to gen needed files.More info: man find <br>
+Now we support Linux and MAC OS, do not support Windows, caused by windows do not support 'find' <br>
+command, If u want to use it at windows env, U need to expand Windows sopport unix-like 'find' <br>
+by tools like: 'git for windows' <br>
 
 Install
 ===
@@ -47,6 +50,7 @@ U need remove old config like: <br>
 1: remove hard config database in vimrc eg: set tag=tags; <br>
 2: remove hard config database in vimrc eg: cs add xxx <br>
 3: also need remove database manage plugn if U used <br> 
+4: python install psutil by command: pip install psutil <br>
 ps: 1 2 3 function already be integrated in "auto_update_cscope_ctags_database" <br>
 
 

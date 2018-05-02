@@ -6,6 +6,7 @@ import time
 import getpass
 import threading
 import getopt
+import psutil
 
 arch_parameter_list = ['not_kernel']
 
@@ -41,6 +42,7 @@ show_msg_bool = False
 support_soft_link_str = 'ignore'
 
 def parse_args():
+
     global arch_type_str
     global database_type_str
     global pwd_dir_str
@@ -210,6 +212,7 @@ def Warnin_print(str):
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
     #or not kernel code 
+
     if not os.path.exists(pwd_dir_str):
         Warnin_print("Err :invalid pwd_dir_str: %s" % pwd_dir_str)
         return 0
@@ -235,6 +238,7 @@ def gen_cscope_and_ctag_file():
         self_name  = ''
         debug_backrun_python_print("now write pid to lock")
         self_pid = os.getpid()
+        '''
         self_cmd_str = "/proc/%s/cmdline" % self_pid
         if os.path.exists(self_cmd_str):
             f = open(self_cmd_str, 'r')
@@ -252,6 +256,13 @@ def gen_cscope_and_ctag_file():
             f = open('.auto_cscope_ctags/lock', 'w+')
             f.write(str_to_lock)
             f.close()
+        '''
+        process_name = psutil.Process(self_pid).cmdline()
+        str_to_lock = "%s\n%s\n" % (self_pid, process_name)
+        debug_backrun_python_print("str_to_lock %s" % str_to_lock)
+        f = open('.auto_cscope_ctags/lock', 'w+')
+        f.write(str_to_lock)
+        f.close()
 
         debug_backrun_python_print("end write pid to lock")
     else:
