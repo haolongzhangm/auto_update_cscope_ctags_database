@@ -2,9 +2,16 @@ Brief (V4.0.1)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth(base autoload_cscope_ctags.vim)
 -----
+<p align="center">
+<img src="https://github.com/haolongzhangm/auto_update_cscope_ctags_database/blob/master/example_gif/auo_swtich_diff_project_tags.gif" />
+</p>
 
 #auto update database if cscope connect
 -----
+<p align="center">
+<img src="https://github.com/haolongzhangm/auto_update_cscope_ctags_database/blob/master/example_gif/auto_update_database.gif" />
+</p>
+
 After run buffer write command eg, w, we will try update database if already connect a cscope database,<br>
 also we can check file update(may casued by git pull , add new file or edit by notepad) <br>
 when fistly load vim <br>
@@ -25,6 +32,9 @@ espiaclly, user disable g:auto_run_function_when_cscope_connect = 0  <br>
 
 #easy create new cscope and ctags databse by command  :Createtag
 -----
+<p align="center">
+<img src="https://github.com/haolongzhangm/auto_update_cscope_ctags_database/blob/master/example_gif/create_tag_eg.gif" />
+</p>
 can intelligent identificate Linux kernel dir eg:<br>
 even U eidt at subdir like  vim kirkwood-cpufreq.c  at dir kernel/drivers/cpufreq <br>
 we can intelligent detect it is a Linux kernel tree, then call make cscope [ARCH] for gen <br>
@@ -103,7 +113,16 @@ python3<br>
 -enable-python3interp=yes<br>
 --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
 
-suggest  build with python2 <br>
+summary config with python2:<br>
+./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
+--enable-pythoninterp=yes  <br>
+--with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
+
+summary config with python3:<br>
+./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
+-enable-python3interp=yes<br>
+--with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
+
 c:make -j2<br>
 d:sudo make install <br>
 e:open a new terminal input command: vim --version to check vim support feature<br>
