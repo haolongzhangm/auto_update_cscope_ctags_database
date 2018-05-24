@@ -60,7 +60,6 @@ U need remove old config like: <br>
 1: remove hard config database in vimrc eg: set tag=tags; <br>
 2: remove hard config database in vimrc eg: cs add xxx <br>
 3: also need remove database manage plugn if U used <br> 
-4: python install psutil by command: pip install psutil <br>
 ps: 1 2 3 function already be integrated in "auto_update_cscope_ctags_database" <br>
 
 
@@ -96,44 +95,38 @@ also suggest build vim with timers(vim --version| grep timers)<br>
 if U vim do not support timers , Feature (auto reset cscope' and 'check_update_when_first_load_vim)will be disable<br>
 which will can use base function(update cscope and ctags database)<br>
 
-#build new vim for support timers and python
+# (ubuntu/Linux) build
 -----
-0: before build vim,suggest install: （ubuntu）sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
-tcl-dev libperl-dev libncurses5-dev python-dev python3-dev(if U use python3) <br>
-a:  https://github.com/vim/vim download vim src <br>
-b: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
-
-for python please choose python2 or python3  <br>
-
-python2 <br>
---enable-pythoninterp=yes  <br>
---with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
-
-python3<br>
--enable-python3interp=yes<br>
---with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
+a: sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
+b: sudo apt-get install tcl-dev libperl-dev libncurses5-dev python-dev python3-dev<br>
+c: pip install psutil <br>
+d: pip3 install psutil <br>
+e: git clone https://github.com/vim/vim.git   download vim src <br>
 
 summary config with python2:<br>
 ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
---enable-pythoninterp=yes  <br>
---with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
+--enable-pythoninterp=yes --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
 
 summary config with python3:<br>
-./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
--enable-python3interp=yes<br>
---with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
+./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes 
+-enable-python3interp=yes --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
 
-for macos only:  <br>
-1:not need input --with-python-config-dir when build vim <br>
-2:mac ctags default is not exuberant-ctags, so u need install <br>
-exuberant-ctags by command: brew install ctags-exuberant <br>
-then close the terminal, reopen a new terminal, then input <br>
-'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
-not '/usr/bin/ctags' <br>
-
-c:make -j2<br>
-d:sudo make install <br>
-e:open a new terminal input command: vim --version to check vim support feature<br>
+#(MacOS) build
+-----
+0: install brew command: ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" <br>
+a: brew install python <br>
+b: brew install python3 <br>
+c: pip install psutil <br>
+d: pip3 install psutil <br>
+e: MacOS ctags default is not exuberant-ctags, so u need install <br>
+   exuberant-ctags by command: brew install ctags-exuberant <br>
+   then close the terminal, reopen a new terminal, then input <br>
+   'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
+   not '/usr/bin/ctags' <br>
+f: git clone https://github.com/vim/vim.git   download vim src <br>
+J: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes  --enable-python3interp=yes --enable-cscope --enable-rubyinterp=yes --enable-perlinterp=yes  <br>
+H: make -j4<br>
+I:sudo make install <br>
 
 config you own prefer Featrue(Do not config anything, plugn also work fine)
 ===
