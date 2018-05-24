@@ -123,6 +123,14 @@ summary config with python3:<br>
 -enable-python3interp=yes<br>
 --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
 
+for macos only:  <br>
+1:not need input --with-python-config-dir when build vim <br>
+2:mac ctags default is not exuberant-ctags, so u need install <br>
+exuberant-ctags by command: brew install ctags-exuberant <br>
+then close the terminal, reopen a new terminal, then input <br>
+'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
+not '/usr/bin/ctags' <br>
+
 c:make -j2<br>
 d:sudo make install <br>
 e:open a new terminal input command: vim --version to check vim support feature<br>

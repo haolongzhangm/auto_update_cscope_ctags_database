@@ -7,6 +7,7 @@ import getpass
 import threading
 import getopt
 import psutil
+import platform
 
 arch_parameter_list = ['not_kernel']
 
@@ -422,7 +423,11 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         handle_tags_files_cmd = "cp cscope.files tags.files; "
         diff_size = 0
         if not 'not_kernel' == arch_type_str:
-            handle_tags_files_cmd = handle_tags_files_cmd + "sed -i '1,2d' tags.files"
+            #fix issue on MACOS sed issue: 'undefined label'
+            if platform.system() == 'Darwin':
+                handle_tags_files_cmd = handle_tags_files_cmd + "sed -i '' '1,2d' tags.files"
+            else:
+                handle_tags_files_cmd = handle_tags_files_cmd + "sed -i '1,2d' tags.files"
             #-k -q line size = 8
             diff_size = 8
 
