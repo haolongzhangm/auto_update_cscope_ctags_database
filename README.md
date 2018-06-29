@@ -98,7 +98,7 @@ which will can use base function(update cscope and ctags database)<br>
 # (ubuntu/Linux) build
 -----
 a: sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
-b: sudo apt-get install tcl-dev libperl-dev libncurses5-dev python-dev python3-dev<br>
+b: sudo apt-get install tcl-dev libperl-dev libncurses5-dev python-dev python3-dev ruby-dev<br>
 c: pip install psutil <br>
 d: pip3 install psutil <br>
 e: git clone https://github.com/vim/vim.git   download vim src <br>
