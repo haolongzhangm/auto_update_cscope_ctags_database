@@ -25,6 +25,7 @@ let g:in_cmdline_mode_t = 0
 let g:in_cmdline_mode_t_load = 0
 let g:enable_soft_link_file = 'ignore'
 let g:add_pythonlib = 'ignore'
+let b:do_not_care_dir = 'ignore'
 "end internal use"
 
 "For debug print"
@@ -158,8 +159,8 @@ if 1 == a:mode
         let b:tmp_dir_i = 'null'
         echo " "
         echo "Customization for tag dir for 'not_kernel' project"
-        echo "please input a dir you want ,suggest dir = " . g:to_user_suggest_tag_dir_str_vim
-        echo "Press 'Enter' to use suggest dir [" . g:to_user_suggest_tag_dir_str_vim . "]" 
+        echo "please input a dir you want ,default dir = " . g:to_user_suggest_tag_dir_str_vim
+        echo "Press 'Enter' to use default dir [" . g:to_user_suggest_tag_dir_str_vim . "]"
         \ . " or input dir which you tend to"
         let b:tmp_dir_i = input("Press 'ENTER' or  input a dir string: ")
         if "" == b:tmp_dir_i
@@ -179,8 +180,42 @@ if 1 == a:mode
 		let cmd_output = system(b:remove_old_cscope)
 		let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
 		let cmd_output = system(remove_old_tags)
+		let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
+		let cmd_output = system(remove_old_dir)
 	endif
     endif
+
+if has('pythonx')
+pyx << EOF
+import vim
+import os
+handle_dir = vim.eval("g:to_user_suggest_tag_dir_str_vim")
+sub_dir = []
+os.chdir(handle_dir)
+old_dir = os.getcwd()
+try:
+	f = os.listdir(handle_dir)
+	for i in f:
+		if os.path.isdir(i) and i != '.auto_cscope_ctags' and i != '.' and i != '..' and i != '.git':
+			sub_dir.append(i)
+except OSError:
+	print("can not find dir: %s" % handle_dir)
+os.chdir(old_dir)
+
+sub_dir_s = "Dir list:[ "
+if len(sub_dir):
+	vim.command("let g:find_sub_dir = 'yes'")
+	for i in sub_dir:
+		if i != '.auto_cscope_ctags' and i != '.' and i != '..' and i != '.git':
+			sub_dir_s = sub_dir_s + ' ' + i
+	vim.command("let g:sub_dir_s = '%s'" % sub_dir_s)
+else:
+	vim.command("let g:find_sub_dir = 'no'")
+EOF
+else
+	echo "do not support python"
+endif
+
     if "not_kernel" == g:arch_str
 	echo " "
 	echo "Support soft link file or not? (while add -L to find commmand)"
@@ -206,17 +241,36 @@ if 1 == a:mode
 	    echo "Customization do not support python API"
 	    let g:add_pythonlib= "no"
 	endif
+
+  echo " "
+  echo "Config Do not care about dir,Please split with space eg: A B"
+  if 'no' == g:find_sub_dir
+    echo "no sub dir find at: " . g:to_user_suggest_tag_dir_str_vim
+    let b:do_not_care_dir = "no"
+  else
+    echo "Find dir at " . g:to_user_suggest_tag_dir_str_vim . ":"
+    echo g:sub_dir_s . "  ]"
+    let b:do_not_care_dir = input("input Enter means do not config>>> ")
+    if 0 == strlen(b:do_not_care_dir)
+      echo " "
+      echo "Do not config do_not_care_dir"
+      let b:do_not_care_dir = "no"
+    else
+      echo " "
+      echo "Customization config do_not_care_dir: " . b:do_not_care_dir
+  endif
+endif
     endif
 
     let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
       \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
-      \. " -s " .g:enable_soft_link_file . " -y " .g:add_pythonlib
+      \. " -s " .g:enable_soft_link_file . " -y " .g:add_pythonlib . " -r " . "'" . b:do_not_care_dir ."'"
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
     echo " "
     echo "Do you really want to  create tag at dir: [" . g:to_user_suggest_tag_dir_str_vim . "]?"
-    echo "Yes: please input yes start, will take about one minutes(depend on code size and I/O performance)"
+    echo "Yes: please input yes start, will take a while(depend on code size and I/O performance)"
     echo "NO : please input any other char to stop"
     let b:tmps = input(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     echo " "
@@ -790,7 +844,7 @@ def vim_trap_into_python_interface():
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
-                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -y ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -y ignore -r ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 

@@ -41,6 +41,7 @@ database_type_str = 'cscope_and_ctags'
 pwd_dir_str = './'
 show_msg_bool = False
 support_soft_link_str = 'ignore'
+do_not_care_dir = 'ignore'
 
 def parse_args():
 
@@ -50,13 +51,14 @@ def parse_args():
     global show_msg_bool
     global support_soft_link_str
     global add_pythonlib
+    global do_not_care_dir
 
     if 1 >= len(sys.argv):
         Warnin_print("Err: too few args")
         Usage()
 
     try:
-        optlist, args = getopt.getopt(sys.argv[1:], "hms:a:p:d:y:")
+        optlist, args = getopt.getopt(sys.argv[1:], "hms:a:p:d:y:r:")
     except getopt.GetoptError:
         Warnin_print('args err')
         Usage()
@@ -76,6 +78,8 @@ def parse_args():
             database_type_str = value
         elif '-y' == c:
             add_pythonlib = value
+        elif '-r' == c:
+            do_not_care_dir = value
 
     if show_msg_bool:
         Warnin_print('args:')
@@ -291,6 +295,33 @@ def gen_cscope_and_ctag_file():
         debug_backrun_python_print(mark_add_pythonlib_exe)
         os.system(mark_add_pythonlib_exe)
 
+    debug_backrun_python_print("do_not_care_dir config = %s" % do_not_care_dir)
+    if 'ignore' != do_not_care_dir:
+        if 'no' == do_not_care_dir:
+            remove_do_not_care_exe = "rm .auto_cscope_ctags/.do_not_care_dir_detail 1>/dev/null 2>&1"
+            os.system(remove_do_not_care_exe)
+        else:
+            remove_do_not_care_exe = "rm .auto_cscope_ctags/.do_not_care_dir_detail 1>/dev/null 2>&1"
+            remove_do_not_care_exe = remove_do_not_care_exe + ";touch .auto_cscope_ctags/.do_not_care_dir_detail 1>/dev/null 2>&1"
+            os.system(remove_do_not_care_exe)
+            debug_backrun_python_print("remove_do_not_care_exe : %s" % remove_do_not_care_exe)
+            #now update detail dir to .do_not_care_dir_detail
+            valid_dir = []
+            for i in do_not_care_dir.split():
+                if os.path.isdir(i) and i != '.git' and i != '.auto_cscope_ctags' and i != '.' and i != '..':
+                    valid_dir.append(i)
+            if len(valid_dir):
+                do_not_care_dir_s = ''
+                for i in valid_dir:
+                    do_not_care_dir_s = do_not_care_dir_s + ' ' + i
+
+                with open('.auto_cscope_ctags/.do_not_care_dir_detail', 'a') as f:
+                    f.write('%s' % do_not_care_dir_s)
+                debug_backrun_python_print("Do not care about dir: %s" % do_not_care_dir_s)
+            else:
+                remove_do_not_care_exe = "rm .auto_cscope_ctags/.do_not_care_dir_detail 1>/dev/null 2>&1"
+                os.system(remove_do_not_care_exe)
+
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (show_msg_bool, start_time))
     ctags_task = threading.Thread(target = ctags_task_func, args = (show_msg_bool, start_time, cscope_task))
@@ -328,11 +359,29 @@ def cscope_task_func(show_message_enable, s_time):
         if os.path.exists('./.auto_cscope_ctags/.enable_soft_link_file'):
             not_kernel_cmd = not_kernel_cmd + " -L "
 
-        not_kernel_cmd = not_kernel_cmd + " . -name '*.c' "
-        for i_care_type in care_file_type:
-            not_kernel_cmd = not_kernel_cmd + " -o -name " + '\'' + i_care_type + '\''
+        not_kernel_cmd = not_kernel_cmd + " . "
+        do_not_care_dir = []
+        if os.path.exists('./.auto_cscope_ctags/.do_not_care_dir_detail'):
+            with open('.auto_cscope_ctags/.do_not_care_dir_detail', 'r') as f:
+                t = f.readline()
+                for i in t.split():
+                    if os.path.isdir(i) and i != '.git' and i != '.auto_cscope_ctags' and i != '.' and i != '..':
+                        do_not_care_dir.append(i)
 
-        not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config'"
+        if len(do_not_care_dir):
+            s = ' '
+            for i in do_not_care_dir:
+                s = s + '-o -path ./%s -prune ' % i + ' '
+            #remove
+            ss = s[3:]
+            debug_backrun_python_print("do_not_care_dir prune config: %s" % ss)
+            not_kernel_cmd = not_kernel_cmd + ss
+        else:
+            not_kernel_cmd = not_kernel_cmd + " -type f -name '*.c' -print"
+        for i_care_type in care_file_type:
+            not_kernel_cmd = not_kernel_cmd + " -o  -type f -name " + '\'' + i_care_type + '\'' + " -print"
+
+        not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config' -print"
         not_kernel_cmd = not_kernel_cmd + "> cscope.files "
         if os.path.exists('./.auto_cscope_ctags/.add_pythonlib_file'):
             if check_include_filetyle_or_not('*.py'):
