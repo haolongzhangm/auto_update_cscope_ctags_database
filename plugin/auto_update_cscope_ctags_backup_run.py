@@ -544,16 +544,20 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id, ctags_append_mo
             ctags_cmd = ctags_cmd + " --langmap=c:+.h"
         else:
             ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c++:+.opencl --langmap=c++:+.cl"
+
+        if ctags_append_mode_i:
+            ctags_cmd = ctags_cmd + " -f  tags"
+        else:
+            ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
+
         #slient mode
         if 0 == show_message_enable:
-            ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
-            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
-        else:
-            ctags_cmd = ctags_cmd + " -f tags"
-            #Warnin_print(ctags_cmd)
 
-        debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
+        if not ctags_append_mode_i:
+            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
+
+        debug_backrun_python_print("ctags_cmd: %s" % ctags_cmd)
         os.system(ctags_cmd)
 
         #double check uniformity between cscope.files and ctags.files
