@@ -42,6 +42,7 @@ pwd_dir_str = './'
 show_msg_bool = False
 support_soft_link_str = 'ignore'
 do_not_care_dir = 'ignore'
+ctags_append_mode = True
 
 def parse_args():
 
@@ -52,6 +53,7 @@ def parse_args():
     global support_soft_link_str
     global add_pythonlib
     global do_not_care_dir
+    global ctags_append_mode
 
     if 1 >= len(sys.argv):
         Warnin_print("Err: too few args")
@@ -216,7 +218,7 @@ def Warnin_print(str):
 
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
-    #or not kernel code 
+    #or not kernel code
 
     if not os.path.exists(pwd_dir_str):
         Warnin_print("Err :invalid pwd_dir_str: %s" % pwd_dir_str)
@@ -231,6 +233,13 @@ def gen_cscope_and_ctag_file():
     debug_backrun_python_print(arch_type_str)
     gnome_osd_print('%s project update tags start' % arch_type_str)
     os.chdir(pwd_dir_str)
+
+    if os.path.isfile('./cscope.out') and os.path.isfile('./tags') \
+            and os.path.isfile('./.auto_cscope_ctags/.old_cscope.files'):
+        ctags_append_mode = True
+    else:
+        ctags_append_mode = False
+
     pre_create_lock_cmd = "mkdir .auto_cscope_ctags 1>/dev/null 2>&1; \
             touch .auto_cscope_ctags/lock 1>/dev/null 2>&1; sync ;\
             rm .auto_cscope_ctags/cscope_detect_wait 1>/dev/null 2>&1"
@@ -324,7 +333,7 @@ def gen_cscope_and_ctag_file():
 
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (show_msg_bool, start_time))
-    ctags_task = threading.Thread(target = ctags_task_func, args = (show_msg_bool, start_time, cscope_task))
+    ctags_task = threading.Thread(target = ctags_task_func, args = (show_msg_bool, start_time, cscope_task, ctags_append_mode))
 
     cscope_task.start()
     ctags_task.start()
@@ -345,6 +354,8 @@ def gen_cscope_and_ctag_file():
         debug_backrun_python_print("All finish take %s s" % all_take_time)
 
     gnome_osd_print('%s project update tags end' % arch_type_str)
+    update_auto_cscope_ctags_dir_time_cmd = "cp cscope.files .auto_cscope_ctags/.old_cscope.files"
+    os.system(update_auto_cscope_ctags_dir_time_cmd)
 
 def clear_lock_i():
     end_remove_lock_cmd = "rm .auto_cscope_ctags/lock 1>/dev/null  2>&1"
@@ -396,8 +407,8 @@ def cscope_task_func(show_message_enable, s_time):
         not_kernel_cmd = not_kernel_cmd + ";cscope -bkq -i cscope.files -f cscope.out"
         if 0 == show_message_enable:
             not_kernel_cmd = not_kernel_cmd + " 1>/dev/null  2>&1"
-        else:
-            Warnin_print(not_kernel_cmd)
+        #else:
+        #    Warnin_print(not_kernel_cmd)
 
         debug_backrun_python_print(not_kernel_cmd)
         debug_backrun_python_print("now for cscope")
@@ -428,7 +439,7 @@ def cscope_task_func(show_message_enable, s_time):
             debug_backrun_python_print(use_time_str)
         debug_backrun_python_print("end for cscope")
 
-def ctags_task_func(show_message_enable, s_time, cscope_task_id):
+def ctags_task_func(show_message_enable, s_time, cscope_task_id, ctags_append_mode_i):
 
     #wait cscope_task_func touch cscope.files
     i = 0
@@ -483,7 +494,45 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
         debug_backrun_python_print(handle_tags_files_cmd)
         os.system(handle_tags_files_cmd)
 
-        ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+        if ctags_append_mode_i:
+            old_file_size = os.path.getsize("./.auto_cscope_ctags/.old_cscope.files")
+            new_file_size = os.path.getsize("./cscope.files")
+            debug_backrun_python_print("old_file_size = %d new_file_size = %d" % (old_file_size, new_file_size))
+            if old_file_size != new_file_size:
+                ctags_append_mode_i = False
+        if ctags_append_mode_i:
+            #find -newer file than ./.auto_cscope_ctags/.old_cscope.files
+            newer_cmd = "find . -name *.c -newer ./.auto_cscope_ctags/.old_cscope.files"
+            for i_care_type in care_file_type:
+                newer_cmd = newer_cmd + " -o -name " + '\'' + i_care_type \
+                        + '\'' + " -newer ./.auto_cscope_ctags/.old_cscope.files "
+            newer_cmd = newer_cmd + " > ./.auto_cscope_ctags/.tmp_update_file"
+            #print(newer_cmd)
+            os.system(newer_cmd)
+            #new check ./.auto_cscope_ctags/.tmp_update_file file real in cscope.files
+            #set ctags_append_mode_i to False fistly
+            os.system("touch ./tags_append.files")
+            with open("./.auto_cscope_ctags/.tmp_update_file", 'r') as f:
+                lines = f.readlines()
+                if len(lines) > 0:
+                    with open("./cscope.files", 'r') as fc:
+                        with open("./tags_append.files", 'w') as ft:
+                            fc_lines = fc.readlines()
+                            for line in lines:
+                                #May need check performance
+                                check_line = line[2:]
+                                if 'not_kernel' == arch_type_str:
+                                    check_line = line
+
+                                if check_line in fc_lines:
+                                    ft.write(line)
+
+
+
+        if ctags_append_mode_i:
+            ctags_cmd = "ctags -Ra --fields=+lafikmnsztS --extra=+fq -L tags_append.files"
+        else:
+            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
         #kernel mode
         if 'not_kernel' != arch_type_str:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
@@ -502,23 +551,28 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id):
             ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
         else:
             ctags_cmd = ctags_cmd + " -f tags"
-            Warnin_print(ctags_cmd)
+            #Warnin_print(ctags_cmd)
 
         debug_backrun_python_print("show print_message :cmd %s" % ctags_cmd)
         os.system(ctags_cmd)
 
         #double check uniformity between cscope.files and ctags.files
-        while diff_size < (os.path.getsize('./cscope.files') - os.path.getsize('./tags.files')):
-            if 1 == show_message_enable:
-                Warnin_print("max than diff_size, we need update ctags again")
-            else:
-                debug_backrun_python_print("max than diff_size, we need update ctags again")
-            os.system(handle_tags_files_cmd)
-            os.system(ctags_cmd)
+        if not ctags_append_mode_i:
+            while diff_size < (os.path.getsize('./cscope.files') - os.path.getsize('./tags.files')):
+                if 1 == show_message_enable:
+                    Warnin_print("max than diff_size, we need update ctags again")
+                else:
+                    debug_backrun_python_print("max than diff_size, we need update ctags again")
+                os.system(handle_tags_files_cmd)
+                os.system(ctags_cmd)
 
         os.system("rm tags.files")
+        os.system("rm ./.auto_cscope_ctags/.tmp_update_file 1>/dev/null  2>&1")
+        os.system("rm ./tags_append.files 1>/dev/null  2>&1")
         ctags_end_time  = time.time()
         ctags_use_time_str = "Ctags Use time = %s s" % (ctags_end_time - s_time)
+        if ctags_append_mode_i:
+            ctags_use_time_str = ctags_use_time_str + " with append mode"
         if 1 == show_message_enable:
             Warnin_print(ctags_use_time_str)
         else:
