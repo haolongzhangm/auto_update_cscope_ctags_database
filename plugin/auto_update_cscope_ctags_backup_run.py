@@ -502,12 +502,12 @@ def ctags_task_func(show_message_enable, s_time, cscope_task_id, ctags_append_mo
                 ctags_append_mode_i = False
         if ctags_append_mode_i:
             #find -newer file than ./.auto_cscope_ctags/.old_cscope.files
-            newer_cmd = "find . -name *.c -newer ./.auto_cscope_ctags/.old_cscope.files"
+            newer_cmd = "find . -name " + '\'' + "*.c" + '\'' + " -newer ./.auto_cscope_ctags/.old_cscope.files"
             for i_care_type in care_file_type:
                 newer_cmd = newer_cmd + " -o -name " + '\'' + i_care_type \
                         + '\'' + " -newer ./.auto_cscope_ctags/.old_cscope.files "
             newer_cmd = newer_cmd + " > ./.auto_cscope_ctags/.tmp_update_file"
-            #print(newer_cmd)
+            debug_backrun_python_print("newer_cmd = %s" % newer_cmd)
             os.system(newer_cmd)
             #new check ./.auto_cscope_ctags/.tmp_update_file file real in cscope.files
             #set ctags_append_mode_i to False fistly
