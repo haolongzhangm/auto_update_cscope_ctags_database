@@ -510,10 +510,11 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
 
 
 
+        #ctags issue: append mode with -n fields will lead repeated symbols
         if ctags_append_mode_i:
-            ctags_cmd = "ctags -Ra --fields=+lafikmnsztS --extra=+fq -L tags_append.files"
+            ctags_cmd = "ctags -Ra --fields=+lafikmsztS --extra=+fq -L tags_append.files"
         else:
-            ctags_cmd = "ctags -R --fields=+lafikmnsztS --extra=+fq -L tags.files"
+            ctags_cmd = "ctags -R --fields=+lafikmsztS --extra=+fq -L tags.files"
         #kernel mode
         if 'not_kernel' != arch_type_str:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
