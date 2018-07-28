@@ -37,7 +37,7 @@ if !exists('g:Auto_update_cscope_ctags_debug_log')
 endif
 
 "For lock reflash Time:"
-"default value 60"
+"default value 15"
 "g:Auto_update_cscope_ctags_timer_filter"
 "                   this time for filter modify frequency"
 "                   if you want to see database update immediately"
@@ -45,7 +45,7 @@ endif
 "                   ,caused by csocpe or ctags gen database may take a"
 "                   big occupy on disk,you can override at .vimrc"
 if !exists('g:Auto_update_cscope_ctags_timer_filter')
-        let g:Auto_update_cscope_ctags_timer_filter = 10
+        let g:Auto_update_cscope_ctags_timer_filter = 15
 endif
 
 "g:Auto_update_cscope_ctags_lock_floor_max"
