@@ -212,6 +212,24 @@ def Warnin_print(str):
     debug_backrun_python_print(str)
     print(str)
 
+def global_version_check():
+    if 0 == check_os_cmd_exist('gtags'):
+        return 0
+    else:
+        popen_str = "gtags --version" + ' 2>&1'
+        debug_backrun_python_print("popen_str = %s" % popen_str)
+        t = os.popen(popen_str).read()
+        "index 4 is version id,eg gtags (GNU GLOBAL) 6.6.2"
+        try:
+            v = int(t.split()[3].replace('.', ''))
+        except ValueError:
+            v = int(t.split()[4].replace('.', ''))
+
+        if v < 662:
+            return 0
+        else:
+            return 1
+
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
     #or not kernel code
@@ -225,7 +243,13 @@ def gen_cscope_and_ctag_file():
     for env_i in needed_env_list:
         if 0 == check_os_cmd_exist(env_i):
             Warnin_print("ERR: can not find %s pls install it fistly" % env_i)
-            return 0
+            exit(-1)
+
+    if cscope_backend == 'global':
+        if 0 == global_version_check():
+            Warnin_print("ERR: can not find gtags or gtags version too low(at least 6.6.2)")
+            Warnin_print("please upgrade gtags from: https://www.gnu.org/software/global/download.html")
+            exit(-1)
 
     debug_backrun_python_print(arch_type_str)
     gnome_osd_print('%s project update tags start' % arch_type_str)
