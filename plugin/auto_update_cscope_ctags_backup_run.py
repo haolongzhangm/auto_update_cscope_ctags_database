@@ -416,10 +416,7 @@ def update_tags_files(show_message_enable):
         not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config' -print"
         not_kernel_cmd = not_kernel_cmd + "> tags.files "
 
-        if 0 == show_message_enable:
-            not_kernel_cmd = not_kernel_cmd + " 1>/dev/null  2>&1"
-        #else:
-        #    Warnin_print(not_kernel_cmd)
+        #Warnin_print(not_kernel_cmd)
 
         debug_backrun_python_print(not_kernel_cmd)
         os.system(not_kernel_cmd)
@@ -509,7 +506,7 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
                                     check_line = line
 
                                 if check_line in fc_lines:
-                                    ft.write(line)
+                                    ft.write(check_line)
 
 
 

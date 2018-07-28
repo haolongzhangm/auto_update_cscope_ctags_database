@@ -330,7 +330,7 @@ if 1 == a:mode
   echo "Config cscope backend engine, Now support [cscope] and [global]"
   echo "[global] detail: https://www.gnu.org/software/global/"
   let b:cscope_engine_d = {'global':'1', 'cscope':'1'}
-  let b:engine = input("enter to Default 'global'>>> ")
+  let b:engine = input("Press ENTER to use Default 'global'>>> ")
   if b:engine == ''
     let b:engine = 'global'
   endif
@@ -340,7 +340,7 @@ if 1 == a:mode
     echo ">>>>>>>>Do not support " . "cscope engine = ". b:engine
     echo " "
     echo "Now support [cscope] and [global]"
-    let b:engine = input("enter to Default 'global', or input global or cscope>>> ")
+    let b:engine = input("Press ENTER to use Default 'global', or input global or cscope>>> ")
     if b:engine == ''
       let b:engine = 'global'
     endif
@@ -747,7 +747,7 @@ def check_cscope_files_type(directory):
     check_file = directory + '/.auto_cscope_ctags/.arch_type'
     if os.path.exists(check_file):
         debug_python_print("Check cscope type!")
-        #try to read first line from tags.files
+        #try to read first line from .auto_cscope_ctags/.arch_type
         f = open(check_file, 'r')
         for line in f:
             i = i+1
