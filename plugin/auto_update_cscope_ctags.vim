@@ -24,8 +24,9 @@ let g:vim_has_timers = 0
 let g:in_cmdline_mode_t = 0
 let g:in_cmdline_mode_t_load = 0
 let g:enable_soft_link_file = 'ignore'
-let g:add_pythonlib = 'ignore'
 let b:do_not_care_dir = 'ignore'
+let g:for_auto_update_cscope_ctag = "null"
+let g:cscope_backend = "null"
 "end internal use"
 
 "For debug print"
@@ -43,7 +44,7 @@ endif
 "                   ,caused by csocpe or ctags gen database may take a"
 "                   big occupy on disk,you can override at .vimrc"
 if !exists('g:Auto_update_cscope_ctags_timer_filter')
-        let g:Auto_update_cscope_ctags_timer_filter = 60
+        let g:Auto_update_cscope_ctags_timer_filter = 10
 endif
 
 "g:Auto_update_cscope_ctags_lock_floor_max"
@@ -94,6 +95,156 @@ if !has('timers')
     echo "more detail, pls check README"
 endif
 
+"copyright: line 99- line 245, somecode ref form: autoload_cscope_ctags.vim
+"which from Michael Conrad Tadpol Tilsra
+if exists("loaded_autoload_cscope")
+	finish
+endif
+let loaded_autoload_cscope = 1
+
+" requirements, you must have these enabled or this is useless.
+if(  !has('cscope') || !has('modify_fname') )
+  finish
+endif
+
+let s:save_cpo = &cpo
+set cpo&vim
+
+" If you set this to anything other than 1, the menu and macros will not be
+" loaded.  Useful if you have your own that you like.  Or don't want my stuff
+" clashing with any macros you've made.
+if !exists("g:autocscope_menus")
+  let g:autocscope_menus = 1
+endif
+
+"==
+" windowdir
+"  Gets the directory for the file in the current window
+"  Or the current working dir if there isn't one for the window.
+"  Use tr to allow that other OS paths, too
+function s:windowdir()
+  if winbufnr(0) == -1
+    let unislash = getcwd()
+  else
+    let unislash = fnamemodify(bufname(winbufnr(0)), ':p:h')
+  endif
+    return tr(unislash, '\', '/')
+endfunc
+"
+"==
+" Find_in_parent
+" find the file argument and returns the path to it.
+" Starting with the current working dir, it walks up the parent folders
+" until it finds the file, or it hits the stop dir.
+" If it doesn't find it, it returns "Nothing"
+function s:Find_in_parent(fln,flsrt,flstp)
+  let here = a:flsrt
+  while ( strlen( here) > 0 )
+    if filereadable( here . "/" . a:fln )
+      return here
+    endif
+    let fr = match(here, "/[^/]*$")
+    if fr == -1
+      break
+    endif
+    let here = strpart(here, 0, fr)
+    if here == a:flstp
+      break
+    endif
+  endwhile
+  return "Nothing"
+endfunc
+" Unload_csdb
+"  drop cscope connections.
+function s:Unload_csdb()
+  if exists("g:csdbpath")
+    if cscope_connection()
+      let save_csvb = &csverb
+      set nocsverb
+      exe "cs kill " . g:csdbpath
+      set csverb
+      let &csverb = save_csvb
+    endif
+  endif
+  execute 'set tags ='
+endfunc
+"
+"==
+" Cycle_csdb
+"  cycle the loaded cscope db.
+function s:Cycle_csdb()
+    if exists("g:csdbpath")
+      if cscope_connection()
+        return
+        "it is already loaded. don't try to reload it.
+      endif
+    endif
+    "Now we support two type cscope backend: cscope and global
+    "about global, please reference https://www.gnu.org/software/global/
+    let newcsdbpath = s:Find_in_parent("GTAGS",s:windowdir(),$HOME)
+    if newcsdbpath != "Nothing"
+      let g:cscope_backend = "global"
+    else
+      let newcsdbpath = s:Find_in_parent("cscope.out",s:windowdir(),$HOME)
+      if newcsdbpath != "Nothing"
+        let g:cscope_backend = "cscope"
+      else
+        let g:cscope_backend = "null"
+      endif
+    endif
+
+    "if readbuffer is python file && at the new dir can not find
+    "databse we will try to load old databse, caused by we need
+    "use old database when in python lib file
+    if newcsdbpath != "Nothing"
+	    let g:for_auto_update_cscope_ctag = newcsdbpath
+    else
+	    let g:for_auto_update_cscope_ctag = "Nothing"
+    endif
+    if g:for_auto_update_cscope_ctag != "Nothing"
+      let g:csdbpath = g:for_auto_update_cscope_ctag
+      if !cscope_connection()
+        let save_csvb = &csverb
+        set nocsverb
+        "FIX global issue: more detail https://www.gnu.org/software/global/
+        "so we chdir home dir to g:csdbpath
+        if 'null' != g:csdbpath
+          exe "chdir " . g:csdbpath
+        endif
+        if g:cscope_backend == "global"
+          set cscopeprg=gtags-cscope
+          exe "cs add " . g:csdbpath . "/GTAGS " .g:csdbpath
+        elseif g:cscope_backend == "cscope"
+          set cscopeprg=cscope
+          exe "cs add " . g:csdbpath . "/cscope.out " .g:csdbpath
+        endif
+        set csverb
+        let &csverb = save_csvb
+	"echo "Found cscope tag at: " . g:csdbpath
+	"echo "Windowdir: " . s:windowdir()
+	"we think ctags file should at the same dir
+	"so try to update ctags file when proj chang from A to B
+	if filereadable(g:csdbpath . "/tags")
+		"echo "Found tags at: " . g:csdbpath
+		execute 'set tags ='. g:csdbpath . '/tags'
+	else
+		"echo "No tags"
+		execute 'set tags ='
+	endif
+      endif
+    else " No cscope database, undo things. (someone rm-ed it or somesuch)
+      call s:Unload_csdb()
+    endif
+endfunc
+
+" auto toggle the menu
+augroup autoload_cscope
+ au!
+ au BufNewFile,BufEnter *  call <SID>Cycle_csdb()
+ au BufUnload * call <SID>Unload_csdb()
+augroup END
+
+let &cpo = s:save_cpo
 if g:in_cmdline_mode_t_load == 0
   let g:in_cmdline_mode_t_load = 1
   autocmd CmdwinEnter * let g:in_cmdline_mode_t = 1
@@ -170,19 +321,51 @@ if 1 == a:mode
             echo " "
             let g:to_user_suggest_tag_dir_str_vim = b:tmp_dir_i
             echo "use Customization dir[ " . g:to_user_suggest_tag_dir_str_vim . " ]"
-	 endif
+          endif
     endif
+
+"config cscope backend,default default gnu-global
+  echo " "
+  echo "Config cscope backend engine, Now support [cscope] and [global]"
+  echo "[global] detail: https://www.gnu.org/software/global/"
+  let b:cscope_engine_d = {'global':'1', 'cscope':'1'}
+  let b:engine = input("enter to Default 'global'>>> ")
+  if b:engine == ''
+    let b:engine = 'global'
+  endif
+  while ! has_key(b:cscope_engine_d, b:engine)
+    echo " "
+    echo " "
+    echo ">>>>>>>>Do not support " . "cscope engine = ". b:engine
+    echo " "
+    echo "Now support [cscope] and [global]"
+    let b:engine = input("enter to Default 'global', or input global or cscope>>> ")
+    if b:engine == ''
+      let b:engine = 'global'
+    endif
+  endwhile
+  echo " "
+  let g:cscope_backend = b:engine
+  echo "Customization cscope backend engine to " .g:cscope_backend
+
     if cscope_connection() > 0
-        if g:to_user_suggest_tag_dir_str_vim != g:csdbpath
-		echo " "
-		echo "+++++change database dir, so need remove old++++++"
-		let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
-		let cmd_output = system(b:remove_old_cscope)
-		let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
-		let cmd_output = system(remove_old_tags)
-		let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
-		let cmd_output = system(remove_old_dir)
-	endif
+      if g:cscope_backend == 'global'
+        let b:clear_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+        let cmd_output = system(b:clear_cscope)
+      elseif g:cscope_backend == 'cscope'
+        let b:clear_gtags = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
+        let cmd_output = system(b:clear_gtags)
+      endif
+      if g:to_user_suggest_tag_dir_str_vim != g:csdbpath
+        echo " "
+        echo "+++++change database dir, so need remove old++++++"
+        let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+        let cmd_output = system(b:remove_old_cscope)
+        let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
+        let cmd_output = system(remove_old_tags)
+        let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
+        let cmd_output = system(remove_old_dir)
+      endif
     endif
 
 if has('pythonx')
@@ -216,31 +399,18 @@ else
 	echo "do not support python"
 endif
 
-    if "not_kernel" == g:arch_str
-	echo " "
-	echo "Support soft link file or not? (while add -L to find commmand)"
-	let b:support_soft_link = input("Yes: please input 'yes' to support soft link file, default 'NO'>>> ")
-	echo " "
-	if "yes" == b:support_soft_link || "YES" == b:support_soft_link
-	    echo "Customization support soft link file"
-	    let g:enable_soft_link_file = "yes"
-        else
-	    echo "Customization disable soft link file"
-	    let g:enable_soft_link_file = "no"
-	endif
-
-	echo " "
-	echo "Support python API or not? only take effect when project have python file"
-	echo "(if U care about python lib API, U may input yes)"
-	let b:support_pythonlib = input("Yes: please input 'yes' to support pythonlib API, default 'NO'>>> ")
-	echo " "
-	if "yes" == b:support_pythonlib || "YES" == b:support_pythonlib
-	    echo "Customization support python API"
-	    let g:add_pythonlib = "yes"
-        else
-	    echo "Customization do not support python API"
-	    let g:add_pythonlib= "no"
-	endif
+if "not_kernel" == g:arch_str
+  echo " "
+  echo "Support soft link file or not? (while add -L to find commmand)"
+  let b:support_soft_link = input("Yes: please input 'yes' to support soft link file, default 'NO'>>> ")
+  echo " "
+  if "yes" == b:support_soft_link || "YES" == b:support_soft_link
+    echo "Customization support soft link file"
+    let g:enable_soft_link_file = "yes"
+  else
+    echo "Customization disable soft link file"
+    let g:enable_soft_link_file = "no"
+  endif
 
   echo " "
   echo "Config Do not care about dir,Please split with space eg: A B"
@@ -258,13 +428,13 @@ endif
     else
       echo " "
       echo "Customization config do_not_care_dir: " . b:do_not_care_dir
+    endif
   endif
 endif
-    endif
 
     let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
       \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
-      \. " -s " .g:enable_soft_link_file . " -y " .g:add_pythonlib . " -r " . "'" . b:do_not_care_dir ."'"
+      \. " -s " .g:enable_soft_link_file . " -e " .g:cscope_backend . " -r " . "'" . b:do_not_care_dir ."'"
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
@@ -283,7 +453,13 @@ endif
     exe '!' . g:run_c
     execute 'set tags ='. g:to_user_suggest_tag_dir_str_vim . '/tags'
     exe "cs kill -1"
-    exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
+    if g:cscope_backend == "global"
+      set cscopeprg=gtags-cscope
+      exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/GTAGS " . g:to_user_suggest_tag_dir_str_vim
+    elseif g:cscope_backend == "cscope"
+      set cscopeprg=cscope
+      exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
+    endif
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
     let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
 
@@ -410,7 +586,7 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 '.cxx', '.pcc', '.H', '.hh', '.cu', '.prototxt', '.opencl', '.cl', '.cmake']):
 
     ret = 0
-    cmp_file = directory + '/cscope.files'
+    cmp_file = directory + '/tags.files'
     debug_python_print("cmp_file = %s" % cmp_file)
     newer_then_cscope_files=[]
     if not os.path.exists(cmp_file):
@@ -564,13 +740,13 @@ def check_lock_status_and_time(lock_str):
 
 def check_cscope_files_type(directory):
     i = 0
-    max_read_line = 3
+    max_read_line = 1
     ret = 'null'
     head_of_check_file = []
-    check_file = directory + '/cscope.files'
+    check_file = directory + '/.auto_cscope_ctags/.arch_type'
     if os.path.exists(check_file):
         debug_python_print("Check cscope type!")
-        #try to read first three line from cscope.files
+        #try to read first line from tags.files
         f = open(check_file, 'r')
         for line in f:
             i = i+1
@@ -584,15 +760,10 @@ def check_cscope_files_type(directory):
             Warn_print("ERR: invaild file %s " % check_file)
             return ret
 
-        if '-k' == head_of_check_file[0]:
-            debug_python_print('this is a linux kernel project')
-            list_arch = head_of_check_file[2].replace('/', ' ').split()
-            for i in list_arch:
-                debug_python_print(i)
-            ret = list_arch[1]
-        else:
-            debug_python_print('this is a generic project')
-            ret = 'not_kernel'
+        ret = head_of_check_file[0]
+        debug_python_print("Arch type: %s" % ret)
+
+        return ret
 
     else:
         Warn_print("Err: can not find file %s" % check_file)
@@ -670,7 +841,8 @@ def check_kernel_code_characteristic(check_tree):
 
     if 'true' == kernel_tree_or_not:
         force_file = cache_dir + kernel_tree_force_check_file
-        if os.path.exists(force_file):
+        #if os.path.exists(force_file):
+        if True:
             os.chdir(old_dir)
             debug_python_print("sure be kernel_tree, not we update ARCH list")
             arch_dir = cache_dir + "/arch"
@@ -699,7 +871,7 @@ def check_kernel_code_characteristic(check_tree):
 
 def reflash_too_quick(directory):
     ret = 1
-    check_file = directory + '/cscope.files'
+    check_file = directory + '/tags.files'
     if os.path.exists(check_file):
         now_time = time.time()
         md_time = os.stat(check_file).st_mtime
@@ -844,7 +1016,8 @@ def vim_trap_into_python_interface():
                 #vim script api do not support blocking time I/O, so we and '&' here
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
-                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -y ignore -r ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir)
+                backend = vim.eval("g:cscope_backend")
+                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -e %s -r ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir, backend)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
