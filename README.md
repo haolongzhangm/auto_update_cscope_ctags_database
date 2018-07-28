@@ -1,6 +1,6 @@
-Brief (V4.0.1)
+Brief (V5)
 ===
-#auto load cscope database and ctags databse, even diffrect project swicth(base autoload_cscope_ctags.vim)
+#auto load cscope database and ctags databse, even diffrect project swicth
 -----
 <p align="center">
 <img src="https://github.com/haolongzhangm/auto_update_cscope_ctags_database/blob/master/example_gif/auo_swtich_diff_project_tags.gif" />
@@ -50,6 +50,12 @@ if we can not  match kernel tree we will use 'find' command to gen needed files.
 Now we support Linux and MAC OS, do not support Windows, caused by windows do not support 'find' <br>
 command, If u want to use it at windows env, U need to expand Windows sopport unix-like 'find' <br>
 by tools like: 'git for windows' <br>
+for cscope we support two backend, cscope and gloabl, default use global<br>
+global support incremental update mode,cscope do not support<br>
+global will be more fast than cscope, about 2X fast<br>
+global will be more accurate than cscope<br>
+all ctags file use the same with cscope backend create <br>
+
 
 Install
 ===
@@ -60,7 +66,11 @@ U need remove old config like: <br>
 1: remove hard config database in vimrc eg: set tag=tags; <br>
 2: remove hard config database in vimrc eg: cs add xxx <br>
 3: also need remove database manage plugn if U used <br> 
-ps: 1 2 3 function already be integrated in "auto_update_cscope_ctags_database" <br>
+4: remove any vim plugn about gnu-global  <br>
+5: remove any config for gnu-global, like set cscopeprg=gtags-cscope <br>
+6: remove autoload_cscope.vim if u have install this script<br> 
+ps: 1 2 3 4 5function already be integrated in "auto_update_cscope_ctags_database" <br>
+7: cp auto_update_cscope_ctags_database/misc_config/.globalrc ~/
 
 
 #ways A
@@ -77,12 +87,6 @@ just add <br>
 in ~/.vimrc <br>
 then run :<br>
 :PluginInstall<br>
-
-more
------
-remove autoload_cscope.vim if u have install this script(we add more interface in autoload_cscope_ctags.vim,<br> 
-which base on autoload_cscope.vim )<br>
-
 
 Env check
 ===
@@ -101,7 +105,9 @@ a: sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
 b: sudo apt-get install tcl-dev libperl-dev libncurses5-dev python-dev python3-dev ruby-dev<br>
 c: pip install psutil <br>
 d: pip3 install psutil <br>
-e: git clone https://github.com/vim/vim.git   download vim src <br>
+e: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
+    ./configure; make -j2; sudo make install<br>
+f: git clone https://github.com/vim/vim.git   download vim src <br>
 
 summary config with python2:<br>
 ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
@@ -127,6 +133,8 @@ f: git clone https://github.com/vim/vim.git   download vim src <br>
 J: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes  --enable-python3interp=yes --enable-cscope --enable-rubyinterp=yes --enable-perlinterp=yes  <br>
 H: make -j4<br>
 I:sudo make install <br>
+j: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
+    ./configure; make -j2; sudo make install<br>
 
 config you own prefer Featrue(Do not config anything, plugn also work fine)
 ===
@@ -140,7 +148,7 @@ default value 0<br>
 g:Auto_update_cscope_ctags_timer_filter<br>
 -----
 For filter Time:<br>
-default value 60<br>
+default value 10<br>
 this time for filter modify frequency"<br>
 if you want to see database update immediately<br>
 you can modify to 10s or 1s, which I do not suggest<br>
