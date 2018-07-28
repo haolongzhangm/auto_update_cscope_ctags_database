@@ -14,6 +14,7 @@
 "v3.0.2: 20170822 optimize python API support config
 "v4.0.0: 20180128 v4.0 release
 "v4.0.1: 20180528 v4.0.1 support MAC OS
+"v5.0:   20180728 support gnu-global for cscope backend, ctags and global support Append mode
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
