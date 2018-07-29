@@ -614,7 +614,8 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
         for need_type in check_type:
             if i.endswith(need_type):
                 ret=ret+1
-                debug_python_print("Found update file %s" % i)
+                debug_python_print("Already Found first update file %s, quick return" % i)
+                return ret
     return ret
 
 def lock_check_pid(i_lock):
