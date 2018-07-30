@@ -189,8 +189,8 @@ def gnome_osd_print(str):
 
 def debug_backrun_python_print(str):
 
-    user_name = getpass.getuser()
-    vimrc_file = '/home/%s/.vimrc' % user_name
+    user_home = os.path.expanduser('~')
+    vimrc_file = '%s/.vimrc' % user_home
 
     global global_debug_enable
     if -1 == global_debug_enable:
