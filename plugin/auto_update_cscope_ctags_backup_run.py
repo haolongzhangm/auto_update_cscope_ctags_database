@@ -162,7 +162,13 @@ def check_include_filetyle_or_not(filetyle_str):
 def gnome_osd_print(str):
     if 1 == check_os_cmd_exist("notify-send"):
         debug_backrun_python_print("find command: notify-send")
-        cmd_str = "notify-send " + '\"' + str + '\"'+ " &"
+        #ubuntu default notify-osd will ignore -t parameter(default 10s)
+        #if u want to -t 2000 take effect, u can install notify-osd
+        #by command:
+        #sudo add-apt-repository ppa:leolik/leolik
+        #sudo apt update
+        #sudo apt install notify-osd
+        cmd_str = "notify-send -t 2000 " + '\"' + str + '\"'+ " &"
     elif 1 == check_os_cmd_exist("gnome-osd-client"):
         debug_backrun_python_print("find command: gnome-osd-client")
         cmd_str = "gnome-osd-client -f "  + '\"' + "<message id=" + '\'' + \
