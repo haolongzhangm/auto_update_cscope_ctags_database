@@ -25,7 +25,7 @@ let g:vim_has_timers = 0
 let g:in_cmdline_mode_t = 0
 let g:in_cmdline_mode_t_load = 0
 let g:enable_soft_link_file = 'ignore'
-let b:do_not_care_dir = 'ignore'
+let g:do_not_care_dir = 'ignore'
 let g:for_auto_update_cscope_ctag = "null"
 let g:cscope_backend = "null"
 "end internal use"
@@ -417,25 +417,25 @@ if "not_kernel" == g:arch_str
   echo "Config Do not care about dir,Please split with space eg: A B"
   if 'no' == g:find_sub_dir
     echo "no sub dir find at: " . g:to_user_suggest_tag_dir_str_vim
-    let b:do_not_care_dir = "no"
+    let g:do_not_care_dir = "no"
   else
     echo "Find dir at " . g:to_user_suggest_tag_dir_str_vim . ":"
     echo g:sub_dir_s . "  ]"
-    let b:do_not_care_dir = input("input Enter means do not config>>> ")
-    if 0 == strlen(b:do_not_care_dir)
+    let g:do_not_care_dir = input("input Enter means do not config>>> ")
+    if 0 == strlen(g:do_not_care_dir)
       echo " "
       echo "Do not config do_not_care_dir"
-      let b:do_not_care_dir = "no"
+      let g:do_not_care_dir = "no"
     else
       echo " "
-      echo "Customization config do_not_care_dir: " . b:do_not_care_dir
+      echo "Customization config do_not_care_dir: " . g:do_not_care_dir
     endif
   endif
 endif
 
     let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
       \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
-      \. " -s " .g:enable_soft_link_file . " -e " .g:cscope_backend . " -r " . "'" . b:do_not_care_dir ."'"
+      \. " -s " .g:enable_soft_link_file . " -e " .g:cscope_backend . " -r " . "'" . g:do_not_care_dir ."'"
     echo " "
     echo "Will run command:\n" . g:run_c
     echo " "
