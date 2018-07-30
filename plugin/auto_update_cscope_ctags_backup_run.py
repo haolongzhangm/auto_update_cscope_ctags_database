@@ -171,6 +171,9 @@ def gnome_osd_print(str):
             '\'' + " animations=" + '\'' + "off" + '\'' + " hide_timeout=" + \
             '\'' + "4000" + '\'' + " osd_halignment=" + '\'' + "center" + '\'>' \
             + str + "</message>" + '\"&'
+    elif 1 == check_os_cmd_exist("osascript"):
+        cmd_str = "osascript -e '\''display notification"  + '\"' + str + '\"' + \
+                "with title" + '\"' + "vim database updater" + '\"' + '\''
     else :
         debug_backrun_python_print("can not find gnome_osd_print and notify-send, do not show GUI message")
         return 0
