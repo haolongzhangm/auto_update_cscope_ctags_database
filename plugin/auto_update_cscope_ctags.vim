@@ -584,7 +584,8 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 'Drivers', '.scons', '.api', '.tla', '.smh', '.smi', '.smt', '.idl', '.te', \
 '.py', '.S', '.tpl', '.css', '.js', '.txt', 'proto', '.md' '.conf', '.json', \
 'BUILD', '.bzl', 'BUILD', '.hpp', '.launch', '.asm', '.ec', '.pgc', '.m', \
-'.cxx', '.pcc', '.H', '.hh', '.cu', '.prototxt', '.opencl', '.cl', '.cmake']):
+'.cxx', '.pcc', '.H', '.hh', '.cu', '.prototxt', '.opencl', '.cl', '.cmake', \
+'.dtsi', '.dts']):
 
     ret = 0
     cmp_file = directory + '/tags.files'

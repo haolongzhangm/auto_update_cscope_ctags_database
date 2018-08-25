@@ -18,7 +18,8 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
         '*.js', '*.txt', '*.proto', '*.md', '*.conf', '*.json',
         '*.BUILD', '*.bzl', 'BUILD', '*.hpp', '*.launch', '*.asm',
         '*.ec', '*.pgc', '*.m', '*.cxx', '*.pcc', '*.H', '*.hh',
-        '*.cu', '*.prototxt', '*.opencl', '*.cl', '*.cmake']
+        '*.cu', '*.prototxt', '*.opencl', '*.cl', '*.cmake',
+        '*.dtsi', '.dts']
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
@@ -532,7 +533,7 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
             ctags_cmd = ctags_cmd + " -I __initcall+,core_initcall_sync+,subsys_initcall_sync+,fs_initcall_sync"
             ctags_cmd = ctags_cmd + " -I late_initcall_sync+,arch_initcall_sync+,rootfs_initcall+,pure_initcall+,__exitcall"
             ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
-            ctags_cmd = ctags_cmd + " --langmap=c:+.h"
+            ctags_cmd = ctags_cmd + " --langmap=c:+.h --langmap=c:+.dts --langmap=c:+.dtsi"
         else:
             ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c++:+.opencl --langmap=c++:+.cl"
 

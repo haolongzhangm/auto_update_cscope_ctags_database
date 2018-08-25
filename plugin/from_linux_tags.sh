@@ -155,6 +155,8 @@ docscope()
 dogtags()
 {
 	all_target_sources > tags.files
+	find -name "*.dts" >> tags.files
+	find -name "*.dtsi" >> tags.files
 }
 
 # Basic regular expressions with an optional /kind-spec/ for ctags and
