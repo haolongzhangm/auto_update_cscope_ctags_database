@@ -361,11 +361,20 @@ if 1 == a:mode
         echo " "
         echo "+++++change database dir, so need remove old++++++"
         let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+        echo "Try " . b:remove_old_cscope
         let cmd_output = system(b:remove_old_cscope)
         let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
+        echo "Try " . remove_old_tags
         let cmd_output = system(remove_old_tags)
         let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
+        echo "Try " . remove_old_dir
         let cmd_output = system(remove_old_dir)
+        let remove_old_tags_files = 'rm ' . g:csdbpath . '/tags.files'
+        echo "Try " . remove_old_tags_files
+        let cmd_output = system(remove_old_tags_files)
+        let b:clear_gtagss = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
+        echo "Try " . b:clear_gtagss
+        let cmd_output = system(b:clear_gtagss)
       endif
     endif
 
