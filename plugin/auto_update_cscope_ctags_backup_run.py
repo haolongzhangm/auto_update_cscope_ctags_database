@@ -389,9 +389,9 @@ def gen_cscope_and_ctag_file():
 
 def clear_lock_i():
     end_remove_lock_cmd = "rm .auto_cscope_ctags/lock 1>/dev/null  2>&1"
-    debug_backrun_python_print("now for remove_lock_cmd")
+    debug_backrun_python_print("now try remove lock!")
     os.system(end_remove_lock_cmd)
-    debug_backrun_python_print("end for remove_lock_cmd")
+    #do not add any code after os.system(end_remove_lock_cmd)
 
 def update_tags_files(show_message_enable):
 
