@@ -382,11 +382,10 @@ def gen_cscope_and_ctag_file():
     else:
         debug_backrun_python_print("All finish take %s s" % all_take_time)
 
-    clear_lock_i()
-
     gnome_osd_print('%s project update tags end' % arch_type_str)
     update_auto_cscope_ctags_dir_time_cmd = "cp tags.files .auto_cscope_ctags/.old_tags.files"
     os.system(update_auto_cscope_ctags_dir_time_cmd)
+    clear_lock_i()
 
 def clear_lock_i():
     end_remove_lock_cmd = "rm .auto_cscope_ctags/lock 1>/dev/null  2>&1"
