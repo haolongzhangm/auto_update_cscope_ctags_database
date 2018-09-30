@@ -376,12 +376,13 @@ def gen_cscope_and_ctag_file():
     ctags_task.join()
     #end thread
 
-    clear_lock_i()
     all_take_time  = time.time() - misc_start_time
     if 1 == show_msg_bool:
         Warnin_print("All finish take %s s" % all_take_time)
     else:
         debug_backrun_python_print("All finish take %s s" % all_take_time)
+
+    clear_lock_i()
 
     gnome_osd_print('%s project update tags end' % arch_type_str)
     update_auto_cscope_ctags_dir_time_cmd = "cp tags.files .auto_cscope_ctags/.old_tags.files"
