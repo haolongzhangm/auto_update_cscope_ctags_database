@@ -40,6 +40,7 @@ show_msg_bool = False
 support_soft_link_str = 'ignore'
 do_not_care_dir = 'ignore'
 ctags_append_mode = True
+go_on = True
 
 def parse_args():
 
@@ -239,11 +240,19 @@ def global_version_check():
             return 0
         else:
             return 1
+def show_go():
+    global go_on
+    while True:
+        time.sleep(1)
+        if go_on == False:
+            break
+        print('waiting...........')
 
 def gen_cscope_and_ctag_file():
     #if you kernel do not support command: make cscope ARCH=arm
     #or not kernel code
 
+    global go_on
     misc_start_time = time.time()
     if not os.path.exists(pwd_dir_str):
         Warnin_print("Err :invalid pwd_dir_str: %s" % pwd_dir_str)
@@ -364,6 +373,7 @@ def gen_cscope_and_ctag_file():
     # add thread
     cscope_task = threading.Thread(target = cscope_task_func, args = (show_msg_bool, cscope_backend))
     ctags_task = threading.Thread(target = ctags_task_func, args = (show_msg_bool, ctags_append_mode))
+    go_task = threading.Thread(target = show_go)
 
     cscope_task.start()
     ctags_task.start()
@@ -371,6 +381,7 @@ def gen_cscope_and_ctag_file():
         Warnin_print("")
         Warnin_print("cscope_task = %s" % cscope_task)
         Warnin_print("ctags_task = %s" % ctags_task)
+        go_task.start()
 
     cscope_task.join()
     ctags_task.join()
@@ -378,6 +389,7 @@ def gen_cscope_and_ctag_file():
 
     all_take_time  = time.time() - misc_start_time
     if 1 == show_msg_bool:
+        go_on = False
         Warnin_print("All finish take %s s" % all_take_time)
     else:
         debug_backrun_python_print("All finish take %s s" % all_take_time)
