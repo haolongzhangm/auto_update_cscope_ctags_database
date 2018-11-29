@@ -103,8 +103,8 @@ which will can use base function(update cscope and ctags database)<br>
 -----
 a: sudo apt-get install libgtk2.0-dev libxt-dev libx11-dev <br>
 b: sudo apt-get install tcl-dev libperl-dev libncurses5-dev python-dev python3-dev ruby-dev<br>
-c: pip install psutil <br>
-d: pip3 install psutil <br>
+c: sudo pip install psutil <br>
+d: sudo pip3 install psutil <br>
 e: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
     ./configure; make -j2; sudo make install<br>
 f: git clone https://github.com/vim/vim.git   download vim src <br>
@@ -112,10 +112,12 @@ f: git clone https://github.com/vim/vim.git   download vim src <br>
 summary config with python2:<br>
 ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
 --enable-pythoninterp=yes --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/  (this dir may diff between diff pc)  <br>
+build/install vim : sudo make install -j8 <br>
 
 summary config with python3:<br>
 ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes 
 -enable-python3interp=yes --with-python-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu/ (this dir may diff between diff pc) <br>
+build/install vim : sudo make install -j8 <br>
 
 #(MacOS) build
 -----
