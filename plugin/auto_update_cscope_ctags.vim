@@ -442,7 +442,7 @@ if "not_kernel" == g:arch_str
   endif
 endif
 
-    let g:run_c = "python " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
+    let g:run_c = "python3 " .g:create_tag_run_py_ret_vim . " -a " .g:arch_str . " -d "
       \. "cscope_and_ctags" . " -p " .g:to_user_suggest_tag_dir_str_vim . " -m "
       \. " -s " .g:enable_soft_link_file . " -e " .g:cscope_backend . " -r " . "'" . g:do_not_care_dir ."'"
     echo " "
@@ -1029,7 +1029,7 @@ def vim_trap_into_python_interface():
                 #why do not use vim timer: long time I/O may cause vim exit err,also 
                 #vim block for input(vim timer base in input thread?)
                 backend = vim.eval("g:cscope_backend")
-                back_run_cmd = "python %s -a %s -d %s -p %s -s ignore -e %s -r ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir, backend)
+                back_run_cmd = "python3 %s -a %s -d %s -p %s -s ignore -e %s -r ignore &" % (run_py_ret, handle_arch, "cscope_and_ctags", may_tags_dir, backend)
                 debug_python_print(back_run_cmd)
                 os.system(back_run_cmd)
 
