@@ -126,16 +126,17 @@ a: brew install python <br>
 b: brew install python3 <br>
 c: pip install psutil <br>
 d: pip3 install psutil <br>
-e: MacOS ctags default is not exuberant-ctags, so u need install <br>
+e: brew install findutils (export PATH=/usr/local/opt/findutils/libexec/gnubin:$PATH); brew install cscope
+f: MacOS ctags default is not exuberant-ctags, so u need install <br>
    exuberant-ctags by command: brew install ctags-exuberant <br>
    then close the terminal, reopen a new terminal, then input <br>
    'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
    not '/usr/bin/ctags' <br>
-f: git clone https://github.com/vim/vim.git   download vim src <br>
-J: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes  --enable-python3interp=yes --enable-cscope --enable-rubyinterp=yes --enable-perlinterp=yes  <br>
-H: make -j4<br>
-I:sudo make install <br>
-j: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
+g: git clone https://github.com/vim/vim.git   download vim src <br>
+h: ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes  --enable-python3interp=yes --enable-cscope --enable-rubyinterp=yes --enable-perlinterp=yes  <br>
+i: make -j4<br>
+j:sudo make install <br>
+k: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
     ./configure; make -j2; sudo make install<br>
 
 config you own prefer Featrue(Do not config anything, plugn also work fine)
