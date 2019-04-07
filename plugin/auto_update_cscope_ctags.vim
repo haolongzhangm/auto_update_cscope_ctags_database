@@ -816,7 +816,7 @@ def check_kernel_code_characteristic(check_tree):
 
     #list some dir of kernel code here
     kernel_code_tree_characteristic_set = ['arch', 'block', 'Documentation', 'drivers', \
-            'firmware', 'fs', 'include', 'init', 'ipc', 'kernel', 'lib', 'mm', \
+            'fs', 'include', 'init', 'ipc', 'kernel', 'lib', 'mm', \
             'net']
     #if we check the code is kernel tree, we will use ./scripts/tags.sh to gen tag, so
     #we need double check file exists(realize function : make cscope ARCH=[ARCH])
