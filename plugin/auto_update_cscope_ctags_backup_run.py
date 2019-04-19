@@ -23,7 +23,7 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
-global_back_run_log_file = '/tmp/.Auto_update_cscope_ctags_debug_back_run.log'
+global_back_run_log_file = os.path.expanduser('~') + '/.Auto_update_cscope_ctags_debug_back_run.log'
 
 global_debug_enable = -1
 

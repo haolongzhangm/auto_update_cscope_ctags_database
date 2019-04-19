@@ -203,6 +203,6 @@ issue report
 ==== 
 *1:enable  'let g:Auto_update_cscope_ctags_debug_log = 1' in ~/.vimrc <br>
 *2:reopen vim , reproducte issue<br>
-*3:upload logfile : /tmp/.Auto_update_cscope_ctags_debug_back_run.log /tmp/.Auto_update_cscope_ctags_debug_log.log<br>
+*3:upload logfile : ~/.Auto_update_cscope_ctags_debug_back_run.log ~/.Auto_update_cscope_ctags_debug_log.log<br>
 *4:also upload err info in vim eidt window
 

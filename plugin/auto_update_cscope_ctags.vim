@@ -561,7 +561,7 @@ import time
 import getpass
 import psutil
 
-global_log_file = '/tmp/.Auto_update_cscope_ctags_debug_log.log'
+global_log_file = os.path.expanduser('~') +  '/.Auto_update_cscope_ctags_debug_log.log'
 arch_parameter_list = ['not_kernel']
 
 def debug_python_print(str):
