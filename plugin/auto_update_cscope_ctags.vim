@@ -242,7 +242,7 @@ endfunc
 augroup autoload_cscope
  au!
  au BufNewFile,BufEnter *  call <SID>Cycle_csdb()
- au BufUnload * call <SID>Unload_csdb()
+ au BufLeave * call <SID>Unload_csdb()
 augroup END
 
 let &cpo = s:save_cpo
