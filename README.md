@@ -107,6 +107,8 @@ c: sudo pip install psutil <br>
 d: sudo pip3 install psutil <br>
 e: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
     ./configure; make -j2; sudo make install<br>
+    then merge .globalrc file, if you do not config this file <br>
+    just do: cp ~/.vim/bundle/auto_update_cscope_ctags_database/misc_config/.globalrc ~/ <br>
 f: git clone https://github.com/vim/vim.git   download vim src <br>
 
 summary config with python2:<br>
@@ -138,6 +140,8 @@ i: make -j4<br>
 j:sudo make install <br>
 k: install gnu-global from: https://www.gnu.org/software/global/download.html <br>
     ./configure; make -j2; sudo make install<br>
+    then merge .globalrc file, if you do not config this file <br>
+    just do: cp ~/.vim/bundle/auto_update_cscope_ctags_database/misc_config/.globalrc ~/ <br>
 
 config you own prefer Featrue(Do not config anything, plugn also work fine)
 ===
