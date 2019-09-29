@@ -547,7 +547,7 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
             ctags_cmd = ctags_cmd + " -I DEFINE_SRCU+,security_initcall+,postcore_initcall_sync+,device_initcall_sync"
             ctags_cmd = ctags_cmd + " --langmap=c:+.h --langmap=c:+.dts --langmap=c:+.dtsi"
         else:
-            ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c++:+.opencl --langmap=c++:+.cl --langmap=c:+.inc --langmap=c:+.ph"
+            ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c:+.opencl --langmap=c:+.cl --langmap=c:+.inc --langmap=c:+.ph"
             ctags_cmd = ctags_cmd + " --langmap=c:+.s --langmap=c:+.S --langmap=c:+.ld"
 
         if ctags_append_mode_i:
