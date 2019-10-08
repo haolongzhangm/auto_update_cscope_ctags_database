@@ -19,7 +19,8 @@ care_file_type = ['*.c', '*.cpp', '*.h', '*.cc', '*.java', '*.sh',
         '*.BUILD', '*.bzl', 'BUILD', '*.hpp', '*.launch', '*.asm',
         '*.ec', '*.pgc', '*.m', '*.cxx', '*.pcc', '*.H', '*.hh',
         '*.cu', '*.prototxt', '*.opencl', '*.cl', '*.cmake',
-        '*.dtsi', '*.dts', '*.inc', '*.ph', '*.s', '*.S', '*.ld']
+        '*.dtsi', '*.dts', '*.inc', '*.ph', '*.s', '*.S', '*.ld',
+        '*.inl']
 
 needed_env_list = ['python', 'cscope', 'sed', 'ctags']
 
@@ -548,7 +549,7 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
             ctags_cmd = ctags_cmd + " --langmap=c:+.h --langmap=c:+.dts --langmap=c:+.dtsi"
         else:
             ctags_cmd = ctags_cmd + " --langmap=c++:+.cu --langmap=c:+.opencl --langmap=c:+.cl --langmap=c:+.inc --langmap=c:+.ph"
-            ctags_cmd = ctags_cmd + " --langmap=c:+.s --langmap=c:+.S --langmap=c:+.ld"
+            ctags_cmd = ctags_cmd + " --langmap=c:+.s --langmap=c:+.S --langmap=c:+.ld --langmap=c++:+.inl"
 
         if ctags_append_mode_i:
             ctags_cmd = ctags_cmd + " -f  tags"
