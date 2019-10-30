@@ -162,7 +162,10 @@ function s:Unload_csdb()
     if cscope_connection()
       let save_csvb = &csverb
       set nocsverb
-      exe "cs kill " . g:csdbpath
+      try
+        exe "cs kill " . g:csdbpath
+      catch /.*/
+      endtry
       set csverb
       let &csverb = save_csvb
     endif
