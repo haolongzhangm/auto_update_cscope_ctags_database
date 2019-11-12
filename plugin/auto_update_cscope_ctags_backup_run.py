@@ -44,7 +44,6 @@ ctags_append_mode = True
 go_on = True
 
 def parse_args():
-
     global arch_type_str
     global database_type_str
     global pwd_dir_str
@@ -88,7 +87,7 @@ def parse_args():
 
 
 def Usage():
-    Warnin_print('v4.0')
+    Warnin_print('va.0')
     Warnin_print('python %s [hms:a:p:d:y:]' % sys.argv[0])
     Warnin_print(' -h: show help info')
     Warnin_print(' -m: show msg')
@@ -191,7 +190,6 @@ def gnome_osd_print(str):
     os.system(cmd_str)
 
 def debug_backrun_python_print(str):
-
     user_home = os.path.expanduser('~')
     vimrc_file = '%s/.vimrc' % user_home
 
@@ -469,7 +467,6 @@ def update_tags_files(show_message_enable):
             debug_backrun_python_print(use_time_str)
 
 def cscope_task_func(show_message_enable, backend):
-
     cscope_start_time = time.time()
     cscope_cmd = ''
     if backend == 'global':
@@ -494,7 +491,6 @@ def cscope_task_func(show_message_enable, backend):
     debug_backrun_python_print("end for cscope")
 
 def ctags_task_func(show_message_enable, ctags_append_mode_i):
-
     ctags_task_start_time = time.time()
     if 'cscope_and_ctags' == database_type_str:
         debug_backrun_python_print("now for ctag")

@@ -1,4 +1,4 @@
-Brief (V5)
+Brief (Va.0)
 ===
 #auto load cscope database and ctags databse, even diffrect project swicth
 -----
@@ -29,6 +29,9 @@ to start or stop auto update database manually<br>
 we also add a command :Manualupdatedatabaseonetime <br>
 which porvide a chance to update database onetime <br>
 espiaclly, user disable g:auto_run_function_when_cscope_connect = 0  <br>
+
+we also add a command :Manualremovedatabase <br>
+which will be used for remove database <br>
 
 #easy create new cscope and ctags databse by command  :Createtag
 -----

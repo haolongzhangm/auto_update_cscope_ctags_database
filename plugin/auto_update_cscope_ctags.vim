@@ -15,6 +15,7 @@
 "v4.0.0: 20180128 v4.0 release
 "v4.0.1: 20180528 v4.0.1 support MAC OS
 "v5.0:   20180728 support gnu-global for cscope backend, ctags and global support Append mode
+"va.0:   20191112 release
 "Running status"
 "do not modify, internal use"
 let g:Auto_update_cscope_ctags_running_status = 0
@@ -264,6 +265,9 @@ command! -nargs=0 -bar Manualupdatedatabaseonetime
 command! -nargs=0 -bar Createtag
     \  call <SID>Manual_start_stop_auto_update_database(1)
 
+command! -nargs=0 -bar Manualremovedatabase
+    \  call <SID>Manual_remove_database(1)
+
 if g:auto_run_function_when_cscope_connect == 1
 	if g:Auto_update_cscope_ctags_running_status == 0
 		"echo "auto enable tags upload""
@@ -275,6 +279,41 @@ if g:auto_run_function_when_cscope_connect == 1
 	endif
 endif
 
+
+function! <SID>Manual_remove_database(force)
+  if cscope_connection() > 0
+    if g:cscope_backend == 'global'
+      let b:clear_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+      let cmd_output = system(b:clear_cscope)
+    elseif g:cscope_backend == 'cscope'
+      let b:clear_gtags = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
+      let cmd_output = system(b:clear_gtags)
+    endif
+    if a:force || g:to_user_suggest_tag_dir_str_vim != g:csdbpath
+      echo " "
+      echo "+++++remove database+++++++++"
+      let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
+      echo "Try " . b:remove_old_cscope
+      let cmd_output = system(b:remove_old_cscope)
+      let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
+      echo "Try " . remove_old_tags
+      let cmd_output = system(remove_old_tags)
+      let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
+      echo "Try " . remove_old_dir
+      let cmd_output = system(remove_old_dir)
+      let remove_old_tags_files = 'rm ' . g:csdbpath . '/tags.files'
+      echo "Try " . remove_old_tags_files
+      let cmd_output = system(remove_old_tags_files)
+      let b:clear_gtagss = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
+      echo "Try " . b:clear_gtagss
+      let cmd_output = system(b:clear_gtagss)
+      exe "cs kill -1"
+      execute 'set tags ='
+    endif
+  else
+    echo "no database find, skip"
+  endif
+endfunction
 
 function! <SID>Manual_start_stop_auto_update_database(mode)
 if 1 == a:mode
@@ -352,34 +391,7 @@ if 1 == a:mode
   let g:cscope_backend = b:engine
   echo "Customization cscope backend engine to " .g:cscope_backend
 
-    if cscope_connection() > 0
-      if g:cscope_backend == 'global'
-        let b:clear_cscope = 'rm ' . g:csdbpath . '/cscope.*'
-        let cmd_output = system(b:clear_cscope)
-      elseif g:cscope_backend == 'cscope'
-        let b:clear_gtags = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
-        let cmd_output = system(b:clear_gtags)
-      endif
-      if g:to_user_suggest_tag_dir_str_vim != g:csdbpath
-        echo " "
-        echo "+++++change database dir, so need remove old++++++"
-        let b:remove_old_cscope = 'rm ' . g:csdbpath . '/cscope.*'
-        echo "Try " . b:remove_old_cscope
-        let cmd_output = system(b:remove_old_cscope)
-        let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
-        echo "Try " . remove_old_tags
-        let cmd_output = system(remove_old_tags)
-        let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
-        echo "Try " . remove_old_dir
-        let cmd_output = system(remove_old_dir)
-        let remove_old_tags_files = 'rm ' . g:csdbpath . '/tags.files'
-        echo "Try " . remove_old_tags_files
-        let cmd_output = system(remove_old_tags_files)
-        let b:clear_gtagss = 'rm ' . g:csdbpath . '/GTAGS;' . 'rm ' . g:csdbpath . '/GPATH;' . 'rm ' . g:csdbpath . '/GRTAGS'
-        echo "Try " . b:clear_gtagss
-        let cmd_output = system(b:clear_gtagss)
-      endif
-    endif
+  call <SID>Manual_remove_database(0)
 
 if has('pythonx')
 pyx << EOF
@@ -427,13 +439,14 @@ if "not_kernel" == g:arch_str
 
   echo " "
   echo "Config Do not care about dir,Please split with space eg: A B"
+  echo "Also support sub-subdir eg: C/D/E"
   if 'no' == g:find_sub_dir
     echo "no sub dir find at: " . g:to_user_suggest_tag_dir_str_vim
     let g:do_not_care_dir = "no"
   else
-    echo "Find dir at " . g:to_user_suggest_tag_dir_str_vim . ":"
+    echo "Find First level dir at " . g:to_user_suggest_tag_dir_str_vim . ":"
     echo g:sub_dir_s . "  ]"
-    let g:do_not_care_dir = input("input Enter means do not config>>> ")
+    let g:do_not_care_dir = input("input Not Care Dirs (Enter means do not config)>>> ")
     if 0 == strlen(g:do_not_care_dir)
       echo " "
       echo "Do not config do_not_care_dir"
@@ -786,7 +799,6 @@ def check_cscope_files_type(directory):
     return ret
 
 def get_backup_run_py():
-
     ret = 'null'
     user_name = getpass.getuser()
     may_backup_run_py_file_tmp = vim.eval("g:auto_update_cscope_ctags_backup_run_py_name_cache")
@@ -816,7 +828,6 @@ def get_backup_run_py():
     return ret
 
 def check_kernel_code_characteristic(check_tree):
-
     #list some dir of kernel code here
     kernel_code_tree_characteristic_set = ['arch', 'block', 'Documentation', 'drivers', \
             'fs', 'include', 'init', 'ipc', 'kernel', 'lib', 'mm', \
@@ -901,7 +912,6 @@ def reflash_too_quick(directory):
     return ret
 
 def vim_trap_into_python_interface():
-
     may_tags_dir = vim.eval("g:for_auto_update_cscope_ctag")
     Create_Mode_I = int(vim.eval("g:Create_Mode"))
     cscope_reset_detect_mode_I = int(vim.eval("g:cscope_reset_detect_mode"))
