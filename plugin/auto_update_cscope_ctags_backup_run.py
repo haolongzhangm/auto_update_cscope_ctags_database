@@ -273,8 +273,8 @@ def gen_cscope_and_ctag_file():
     gnome_osd_print('%s project update tags start' % arch_type_str)
     os.chdir(pwd_dir_str)
 
-    if (os.path.isfile('./cscope.out') or os.path.isfile('./GTAGS')) \
-            and os.path.isfile('./tags') \
+    if (os.path.isfile('./.auto_cscope_ctags./cscope.out') or os.path.isfile('./.auto_cscope_ctags./GTAGS')) \
+            and os.path.isfile('./.auto_cscope_ctags./tags') \
             and os.path.isfile('./.auto_cscope_ctags/.old_tags.files'):
         ctags_append_mode = True
     else:
@@ -394,7 +394,7 @@ def gen_cscope_and_ctag_file():
         debug_backrun_python_print("All finish take %s s" % all_take_time)
 
     gnome_osd_print('%s project update tags end' % arch_type_str)
-    update_auto_cscope_ctags_dir_time_cmd = "cp tags.files .auto_cscope_ctags/.old_tags.files"
+    update_auto_cscope_ctags_dir_time_cmd = "cp .auto_cscope_ctags/tags.files .auto_cscope_ctags/.old_tags.files"
     os.system(update_auto_cscope_ctags_dir_time_cmd)
     clear_lock_i()
 
@@ -408,7 +408,7 @@ def update_tags_files(show_message_enable):
 
     update_tags_files_start_time  = time.time()
     if 'not_kernel' == arch_type_str:
-        not_kernel_cmd = "find"
+        not_kernel_cmd = "cd .auto_cscope_ctags && find .."
         if os.path.exists('./.auto_cscope_ctags/.enable_soft_link_file'):
             not_kernel_cmd = not_kernel_cmd + " -L "
 
@@ -435,7 +435,7 @@ def update_tags_files(show_message_enable):
             not_kernel_cmd = not_kernel_cmd + " -o  -type f -name " + '\'' + i_care_type + '\'' + " -print"
 
         not_kernel_cmd = not_kernel_cmd + " -o -type f -name '*config' -print"
-        not_kernel_cmd = not_kernel_cmd + "> tags.files "
+        not_kernel_cmd = not_kernel_cmd + "> .auto_cscope_ctags/tags.files "
 
         #Warnin_print(not_kernel_cmd)
 
@@ -470,9 +470,9 @@ def cscope_task_func(show_message_enable, backend):
     cscope_start_time = time.time()
     cscope_cmd = ''
     if backend == 'global':
-        cscope_cmd = "gtags -i -f tags.files"
+        cscope_cmd = "cd .auto_cscope_ctags && gtags -i -f tags.files"
     elif backend == 'cscope':
-        cscope_cmd = "cscope -bkq -i tags.files -f cscope.out"
+        cscope_cmd = "cd auto_cscope_ctags && cscope -bkq -i tags.files -f cscope.out"
     else:
         Warnin_print("Do not support cscope backend: %s" % backend)
         exit(-1)
@@ -502,7 +502,7 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
                 ctags_append_mode_i = False
         if ctags_append_mode_i:
             #find -newer file than ./.auto_cscope_ctags/.old_tags.files
-            newer_cmd = "find . -name " + '\'' + "*.c" + '\'' + " -newer ./.auto_cscope_ctags/.old_tags.files"
+            newer_cmd = "cd .auto_cscope_ctags && find .. -name " + '\'' + "*.c" + '\'' + " -newer ./.auto_cscope_ctags/.old_tags.files"
             for i_care_type in care_file_type:
                 newer_cmd = newer_cmd + " -o -name " + '\'' + i_care_type \
                         + '\'' + " -newer ./.auto_cscope_ctags/.old_tags.files "
@@ -531,9 +531,9 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
 
         #ctags issue: append mode with -n fields will lead repeated symbols
         if ctags_append_mode_i:
-            ctags_cmd = "ctags -Ra --fields=+lafikmsztS --extra=+fq -L tags_append.files"
+            ctags_cmd = "cd .auto_cscope_ctags && ctags -Ra --fields=+lafikmsztS --extra=+fq -L tags_append.files"
         else:
-            ctags_cmd = "ctags -R --fields=+lafikmsztS --extra=+fq -L tags.files"
+            ctags_cmd = "cd .auto_cscope_ctags && ctags -R --fields=+lafikmsztS --extra=+fq -L tags.files"
         #kernel mode
         if 'not_kernel' != arch_type_str:
             ctags_cmd = ctags_cmd + " -I EXPORT_SYMBOL+,EXPORT_SYMBOL_GPL+,__acquires+,__releases+,module_init+,module_exit"
@@ -548,16 +548,16 @@ def ctags_task_func(show_message_enable, ctags_append_mode_i):
             ctags_cmd = ctags_cmd + " --langmap=c:+.s --langmap=c:+.S --langmap=c:+.ld --langmap=c++:+.inl --langmap=c:+.cuh"
 
         if ctags_append_mode_i:
-            ctags_cmd = ctags_cmd + " -f  tags"
+            ctags_cmd = ctags_cmd + " -f tags"
         else:
-            ctags_cmd = ctags_cmd + " -f .auto_cscope_ctags/tags"
+            ctags_cmd = ctags_cmd + " -f tags_tmp"
 
         #slient mode
         if 0 == show_message_enable:
             ctags_cmd = ctags_cmd + " 1>/dev/null  2>&1"
 
         if not ctags_append_mode_i:
-            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags ./"
+            ctags_cmd = ctags_cmd + "; mv .auto_cscope_ctags/tags_tmp .auto_cscope_ctags/tags"
 
         debug_backrun_python_print("ctags_cmd: %s" % ctags_cmd)
         os.system(ctags_cmd)

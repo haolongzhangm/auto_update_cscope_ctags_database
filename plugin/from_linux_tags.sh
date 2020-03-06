@@ -37,7 +37,7 @@ fi
 # ignore userspace tools
 ignore="$ignore ( -path ${tree}tools ) -prune -o"
 
-# Find all available archs
+# cd .auto_cscope_ctags && find .. all available archs
 find_all_archs()
 {
 	ALLSOURCE_ARCHS=""
@@ -53,39 +53,39 @@ elif [ "${ALLSOURCE_ARCHS}" = "all" ]; then
 	find_all_archs
 fi
 
-# find sources in arch/$ARCH
+# cd .auto_cscope_ctags && find .. sources in arch/$ARCH
 find_arch_sources()
 {
 	for i in $archincludedir; do
 		prune="$prune -wholename $i -prune -o"
 	done
-	find ${tree}arch/$1 $ignore $subarchprune $prune -name "$2" \
+	cd .auto_cscope_ctags && find .. ${tree}arch/$1 $ignore $subarchprune $prune -name "$2" \
 		-not -type l -print;
 }
 
-# find sources in arch/$1/include
+# cd .auto_cscope_ctags && find .. sources in arch/$1/include
 find_arch_include_sources()
 {
-	include=$(find ${tree}arch/$1/ $subarchprune \
+	include=$(cd .auto_cscope_ctags && find .. ${tree}arch/$1/ $subarchprune \
 					-name include -type d -print);
 	if [ -n "$include" ]; then
 		archincludedir="$archincludedir $include"
-		find $include $ignore -name "$2" -not -type l -print;
+		cd .auto_cscope_ctags && find .. $include $ignore -name "$2" -not -type l -print;
 	fi
 }
 
-# find sources in include/
+# cd .auto_cscope_ctags && find .. sources in include/
 find_include_sources()
 {
-	find ${tree}include $ignore -name config -prune -o -name "$1" \
+	cd .auto_cscope_ctags && find .. ${tree}include $ignore -name config -prune -o -name "$1" \
 		-not -type l -print;
 }
 
-# find sources in rest of tree
+# cd .auto_cscope_ctags && find .. sources in rest of tree
 # we could benefit from a list of dirs to search in here
 find_other_sources()
 {
-	find ${tree}* $ignore \
+	cd .auto_cscope_ctags && find .. ${tree}* $ignore \
 	     \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
 	       -name "$1" -not -type l -print;
 }
@@ -138,7 +138,7 @@ all_target_sources()
 
 all_kconfigs()
 {
-	find ${tree}arch/ -maxdepth 1 $ignore \
+	cd .auto_cscope_ctags && find .. ${tree}arch/ -maxdepth 1 $ignore \
 	       -name "Kconfig*" -not -type l -print;
 	for arch in $ALLSOURCE_ARCHS; do
 		find_sources $arch 'Kconfig*'
@@ -154,9 +154,9 @@ docscope()
 
 dogtags()
 {
-	all_target_sources > tags.files
-	find -name "*.dts" >> tags.files
-	find -name "*.dtsi" >> tags.files
+	all_target_sources > .auto_cscope_ctags/tags.files
+	cd .auto_cscope_ctags && find .. -name "*.dts" >> .auto_cscope_ctags/tags.files
+	cd .auto_cscope_ctags && find .. -name "*.dtsi" >> .auto_cscope_ctags/tags.files
 }
 
 # Basic regular expressions with an optional /kind-spec/ for ctags and
@@ -316,7 +316,7 @@ if [ "${ARCH}" = "um" ]; then
 		archinclude=${SUBARCH}
 	fi
 elif [ "${SRCARCH}" = "arm" -a "${SUBARCH}" != "" ]; then
-	subarchdir=$(find ${tree}arch/$SRCARCH/ -name "mach-*" -type d -o \
+	subarchdir=$(cd .auto_cscope_ctags && find .. ${tree}arch/$SRCARCH/ -name "mach-*" -type d -o \
 							-name "plat-*" -type d);
 	mach_suffix=$SUBARCH
 	plat_suffix=$SUBARCH

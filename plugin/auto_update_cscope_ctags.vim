@@ -143,7 +143,7 @@ function s:Find_in_parent(fln,flsrt,flstp)
   let here = a:flsrt
   while ( strlen( here) > 0 )
     if filereadable( here . "/" . a:fln )
-      return here
+      return here . '/.auto_cscope_ctags'
     endif
     let fr = match(here, "/[^/]*$")
     if fr == -1
@@ -298,7 +298,7 @@ function! <SID>Manual_remove_database(force)
       let remove_old_tags = 'rm ' . g:csdbpath . '/tags'
       echo "Try " . remove_old_tags
       let cmd_output = system(remove_old_tags)
-      let remove_old_dir = 'rm ' . g:csdbpath . '/.auto_cscope_ctags -rf'
+      let remove_old_dir = 'rm ' . g:csdbpath . '../.auto_cscope_ctags -rf'
       echo "Try " . remove_old_dir
       let cmd_output = system(remove_old_dir)
       let remove_old_tags_files = 'rm ' . g:csdbpath . '/tags.files'
@@ -613,7 +613,7 @@ def scan_f_new(directory, check_type=['.c', '.cpp', '.h', '.cc', \
 '.dtsi', '.dts', '.inc', '.ph', '.s', '.S', '.ld', '.inl', '.pl', '.pm', '.cuh']):
 
     ret = 0
-    cmp_file = directory + '/tags.files'
+    cmp_file = directory + '/.auto_cscope_ctags/tags.files'
     debug_python_print("cmp_file = %s" % cmp_file)
     newer_then_cscope_files=[]
     if not os.path.exists(cmp_file):
@@ -897,7 +897,7 @@ def check_kernel_code_characteristic(check_tree):
 
 def reflash_too_quick(directory):
     ret = 1
-    check_file = directory + '/tags.files'
+    check_file = directory + '/.auto_cscope_ctags/tags.files'
     if os.path.exists(check_file):
         now_time = time.time()
         md_time = os.stat(check_file).st_mtime
