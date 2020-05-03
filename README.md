@@ -93,7 +93,7 @@ then run :<br>
 
 Env check
 ===
-need must install: cscope ctags sed python and vim_with_python( vim --version| grep python) <br>
+need must install: cscope sed python and vim_with_python( vim --version| grep python) <br>
 
 if you os support command: gnome-osd-client or notify-send , GUI will show mesage when collect　database <br>
 
@@ -112,7 +112,9 @@ e: install gnu-global from: https://www.gnu.org/software/global/download.html <b
     ./configure; make -j2; sudo make install<br>
     then merge .globalrc file, if you do not config this file <br>
     just do: cp ~/.vim/bundle/auto_update_cscope_ctags_database/misc_config/.globalrc ~/ <br>
-f: git clone https://github.com/vim/vim.git   download vim src <br>
+f: install ctags from: https://github.com/universal-ctags/ctags <br>
+    ./autogen.sh && ./configure && make -j4; sudo make install  <br>
+g: git clone https://github.com/vim/vim.git   download vim src <br>
 
 summary config with python2:<br>
 ./configure  -with-features=huge --enable-rubyinterp --enable-perlinterp=yes --enable-tclinterp=yes <br>
@@ -132,8 +134,8 @@ b: brew install python3 <br>
 c: pip install psutil <br>
 d: pip3 install psutil <br>
 e: brew install findutils (export PATH=/usr/local/opt/findutils/libexec/gnubin:$PATH); brew install cscope
-f: MacOS ctags default is not exuberant-ctags, so u need install <br>
-   exuberant-ctags by command: brew install ctags-exuberant <br>
+f: install ctags from: https://github.com/universal-ctags/ctags <br>
+    ./autogen.sh && ./configure && make -j4; sudo make install  <br>
    then close the terminal, reopen a new terminal, then input <br>
    'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
    not '/usr/bin/ctags' <br>
