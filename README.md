@@ -113,6 +113,9 @@ e: install gnu-global from: https://www.gnu.org/software/global/download.html <b
     then merge .globalrc file, if you do not config this file <br>
     just do: cp ~/.vim/bundle/auto_update_cscope_ctags_database/misc_config/.globalrc ~/ <br>
 f: install ctags from: https://github.com/universal-ctags/ctags <br>
+    sudo apt install gcc make pkg-config autoconf automake python3-docutils  <br>
+    libseccomp-dev libjansson-dev libyaml-dev libxml2-dev <br>
+    or read docs/autotools.rst of universal-ctags code <br>
     ./autogen.sh && ./configure && make -j4; sudo make install  <br>
 g: git clone https://github.com/vim/vim.git   download vim src <br>
 
@@ -135,6 +138,9 @@ c: pip install psutil <br>
 d: pip3 install psutil <br>
 e: brew install findutils (export PATH=/usr/local/opt/findutils/libexec/gnubin:$PATH); brew install cscope
 f: install ctags from: https://github.com/universal-ctags/ctags <br>
+    sudo apt install gcc make pkg-config autoconf automake python3-docutils  <br>
+    libseccomp-dev libjansson-dev libyaml-dev libxml2-dev <br>
+    or read docs/autotools.rst of universal-ctags code <br>
     ./autogen.sh && ./configure && make -j4; sudo make install  <br>
    then close the terminal, reopen a new terminal, then input <br>
    'which ctags', which should output the dir '/usr/local/bin/ctags' <br>
