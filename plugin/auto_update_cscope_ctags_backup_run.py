@@ -138,6 +138,17 @@ def find_python_install_lib():
 
     return (valid_python_lib_dir, pythonlib_install_i)
 
+def check_ctags_version():
+    ret = 0
+    popen_str = 'ctags --version | grep Universal'
+    debug_backrun_python_print("popen_str = %s" % popen_str)
+    if '' == os.popen(popen_str).read():
+        ret = 1
+    else:
+        ret = 0
+
+    return ret
+
 def check_os_cmd_exist(str):
     ret = 0
     popen_str = "which " + str + ' 2>&1'
@@ -262,6 +273,10 @@ def gen_cscope_and_ctag_file():
         if 0 == check_os_cmd_exist(env_i):
             Warnin_print("ERR: can not find %s pls install it fistly" % env_i)
             exit(-1)
+
+    if check_ctags_version():
+        Warnin_print("we need Universal Ctags: https://github.com/universal-ctags/ctags or check README")
+        exit(-1)
 
     if cscope_backend == 'global':
         if 0 == global_version_check():
