@@ -218,10 +218,10 @@ function s:Cycle_csdb()
         endif
         if g:cscope_backend == "global"
           set cscopeprg=gtags-cscope
-          exe "cs add " . g:csdbpath . "/GTAGS " .g:csdbpath
+          silent! exe "cs add " . g:csdbpath . "/GTAGS " .g:csdbpath
         elseif g:cscope_backend == "cscope"
           set cscopeprg=cscope
-          exe "cs add " . g:csdbpath . "/cscope.out " .g:csdbpath
+          silent! exe "cs add " . g:csdbpath . "/cscope.out " .g:csdbpath
         endif
         set csverb
         let &csverb = save_csvb
@@ -481,10 +481,10 @@ endif
     exe "cs kill -1"
     if g:cscope_backend == "global"
       set cscopeprg=gtags-cscope
-      exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/GTAGS " . g:to_user_suggest_tag_dir_str_vim
+      silent! exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/GTAGS " . g:to_user_suggest_tag_dir_str_vim
     elseif g:cscope_backend == "cscope"
       set cscopeprg=cscope
-      exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
+      silent! exe "cs add " . g:to_user_suggest_tag_dir_str_vim . "/cscope.out " . g:to_user_suggest_tag_dir_str_vim
     endif
     let g:csdbpath = g:to_user_suggest_tag_dir_str_vim
     let g:for_auto_update_cscope_ctag = g:to_user_suggest_tag_dir_str_vim
