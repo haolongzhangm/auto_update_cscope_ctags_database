@@ -214,6 +214,12 @@ eg: you add some file in project or edit src by git pull or <br>
 other editer like gedit or notepad, we can detect the update<br>
 you can disable this Feature in .vimrc<br>
 
+g:update_cscope_ctags_do_not_care_dir<br>
+-----
+default ''<br>
+use to config global do not care dir, split with space<br>
+for example: let g:update_cscope_ctags_do_not_care_dir = 'build_dir bazel-bin'<br>
+
 issue report
 ==== 
 *1:enable  'let g:Auto_update_cscope_ctags_debug_log = 1' in ~/.vimrc <br>

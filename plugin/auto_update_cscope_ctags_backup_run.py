@@ -42,6 +42,7 @@ support_soft_link_str = 'ignore'
 do_not_care_dir = 'ignore'
 ctags_append_mode = True
 go_on = True
+vimrc_do_not_care_dir = []
 
 def parse_args():
     global arch_type_str
@@ -85,6 +86,7 @@ def parse_args():
         Warnin_print('args:')
         Warnin_print(  optlist)
 
+    fill_vimrc_do_not_care_dir()
 
 def Usage():
     Warnin_print('va.0')
@@ -199,6 +201,28 @@ def gnome_osd_print(str):
 
     debug_backrun_python_print(cmd_str)
     os.system(cmd_str)
+
+def fill_vimrc_do_not_care_dir():
+    global vimrc_do_not_care_dir
+    user_home = os.path.expanduser('~')
+    vimrc_file = '%s/.vimrc' % user_home
+
+    if os.path.exists(vimrc_file):
+        try:
+            f = open(vimrc_file, 'r')
+        except:
+            return 0
+
+        for line in f:
+            is_find = line.find('let g:update_cscope_ctags_do_not_care_dir')
+            if 0 == is_find:
+                split_number = line.find("'")
+                split_number_end = line.rfind("'")
+                if split_number > 0 and split_number_end > 0:
+                    vimrc_do_not_care_dir = line[split_number + 1 : split_number_end].split()
+                break
+
+        f.close()
 
 def debug_backrun_python_print(str):
     user_home = os.path.expanduser('~')
@@ -352,8 +376,8 @@ def gen_cscope_and_ctag_file():
         os.system(mark_soft_link_exe)
 
     debug_backrun_python_print("do_not_care_dir config = %s" % do_not_care_dir)
-    if 'ignore' != do_not_care_dir:
-        if 'no' == do_not_care_dir:
+    if 'ignore' != do_not_care_dir or len(vimrc_do_not_care_dir) > 0:
+        if 'no' == do_not_care_dir and len(vimrc_do_not_care_dir) == 0:
             remove_do_not_care_exe = "rm .auto_cscope_ctags/.do_not_care_dir_detail 1>/dev/null 2>&1"
             os.system(remove_do_not_care_exe)
         else:
@@ -364,8 +388,10 @@ def gen_cscope_and_ctag_file():
             #now update detail dir to .do_not_care_dir_detail
             valid_dir = []
             for i in do_not_care_dir.split():
-                if os.path.isdir(i) and i != '.git' and i != '.auto_cscope_ctags' and i != '.' and i != '..':
+                if os.path.isdir(i) and i != '.' and i != '..':
                     valid_dir.append(i)
+            for i in vimrc_do_not_care_dir:
+                valid_dir.append(i)
             if len(valid_dir):
                 do_not_care_dir_s = ''
                 for i in valid_dir:
@@ -433,10 +459,12 @@ def update_tags_files(show_message_enable):
             with open('.auto_cscope_ctags/.do_not_care_dir_detail', 'r') as f:
                 t = f.readline()
                 for i in t.split():
-                    if os.path.isdir(i) and i != '.git' and i != '.auto_cscope_ctags' and i != '.' and i != '..':
+                    if i != '.' and i != '..':
                         do_not_care_dir.append(i)
 
         if len(do_not_care_dir):
+            do_not_care_dir.append('.git')
+            do_not_care_dir.append('.auto_cscope_ctags')
             s = ' '
             for i in do_not_care_dir:
                 s = s + '-o -path ./%s -prune ' % i + ' '
