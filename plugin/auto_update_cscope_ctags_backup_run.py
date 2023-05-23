@@ -175,6 +175,10 @@ def check_include_filetyle_or_not(filetyle_str):
     return ret
 
 def gnome_osd_print(str):
+    '''
+    do not show any notify by default
+    '''
+    return
     if 1 == check_os_cmd_exist("notify-send"):
         debug_backrun_python_print("find command: notify-send")
         #ubuntu default notify-osd will ignore -t parameter(default 10s)
@@ -266,9 +270,9 @@ def global_version_check():
         t = os.popen(popen_str).read()
         "index 4 is version id,eg gtags (GNU GLOBAL) 6.6.2"
         try:
-            v = int(t.split()[3].replace('.', ''))
+            v = int(t.split()[2].replace('.', ''))
         except ValueError:
-            v = int(t.split()[4].replace('.', ''))
+            v = int(t.split()[3].replace('.', ''))
 
         if v < 662:
             return 0
